@@ -142,11 +142,17 @@ jumbo_data/
 mobile/
 jumbo-mobile/
 
-# Screenshots and images (optional - remove if you want to include them)
-*.png
-*.jpg
-*.jpeg
-*.gif
+# Screenshots and temporary images (exclude specific files if needed)
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+
+# Exclude only screenshots and temporary images
+Screenshot*.png
+screenshot*.png
+temp*.png
+test*.png
 
 # Test files (optional - remove if you want to include tests)
 test_*.py
