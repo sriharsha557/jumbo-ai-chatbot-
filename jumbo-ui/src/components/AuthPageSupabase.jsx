@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { auth, supabase } from '../lib/supabase';
 import { theme } from '../theme/theme';
 import GradientBackground from './GradientBackground';
+import OAuthLoadingOverlay from './OAuthLoadingOverlay';
 
 function AuthPageSupabase({ onUserLogin }) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [showOAuthLoading, setShowOAuthLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -65,23 +67,26 @@ function AuthPageSupabase({ onUserLogin }) {
 
   const handleGoogleSignIn = async () => {
     setIsAuthenticating(true);
+    setShowOAuthLoading(true);
     setError('');
     
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'http://localhost:3000'
+          redirectTo: window.location.origin
         }
       });
       
       if (error) throw error;
       
-      // Redirect will happen automatically
+      // Keep loading overlay visible during redirect
+      // It will be hidden when the page reloads after OAuth
     } catch (error) {
       console.error('Google sign in error:', error);
       setError(error.message);
       setIsAuthenticating(false);
+      setShowOAuthLoading(false);
     }
   };
 
@@ -234,6 +239,9 @@ function AuthPageSupabase({ onUserLogin }) {
           Jumbo is here to listen and support your emotional well-being.
         </p>
       </div>
+      
+      {/* OAuth Loading Overlay */}
+      <OAuthLoadingOverlay show={showOAuthLoading} />
     </GradientBackground>
   );
 }
