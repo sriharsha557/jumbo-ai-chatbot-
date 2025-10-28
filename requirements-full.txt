@@ -1,0 +1,56 @@
+# FULL REQUIREMENTS - For production with heavy ML capabilities
+# Use this when upgrading to paid infrastructure
+
+# Core Flask dependencies
+flask==3.0.0
+flask-cors==4.0.0
+werkzeug==3.0.1
+
+# HTTP and networking
+requests==2.31.0
+urllib3==2.1.0
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# Database and storage
+supabase==2.22.1
+postgrest==2.22.1
+
+# LLM and AI - Full ML stack
+groq==0.4.2
+numpy==1.26.4
+scikit-learn==1.4.2
+
+# Heavy ML - Advanced emotion detection
+transformers==4.41.2
+torch==2.3.1
+sentencepiece==0.2.0
+accelerate==0.31.0
+
+# Authentication and security
+pyjwt[crypto]==2.10.1
+cryptography==42.0.8
+
+# Monitoring and logging
+sentry-sdk[flask]==1.40.0
+
+# Data processing
+pydantic==2.11.7
+
+# Optional: Redis for caching
+redis==5.0.1
+
+# Optional: Metrics and monitoring
+prometheus-client==0.19.0
+
+# Optional: Streamlit for admin dashboard
+streamlit==1.28.1
+
+# Development and testing
+pytest==7.4.3
+pytest-flask==1.3.0
+pytest-cov==4.1.0
+
+# Production server
+gunicorn==21.2.0
