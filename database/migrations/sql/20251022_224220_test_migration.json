@@ -1,0 +1,8 @@
+{
+  "version": "20251022_224220",
+  "name": "test_migration",
+  "description": "Test migration for reliability",
+  "up_sql": "CREATE TABLE test_table (id UUID PRIMARY KEY);",
+  "down_sql": "DROP TABLE test_table;",
+  "created_at": "2025-10-22T22:42:20.093063"
+}

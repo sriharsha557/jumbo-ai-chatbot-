@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: jumbo-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SUPABASE_URL
+        fromDatabase:
+          name: jumbo-db
+          property: connectionString
+      - key: SUPABASE_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://your-vercel-app.vercel.app"
+    healthCheckPath: /health
+    
+databases:
+  - name: jumbo-db
+    databaseName: jumbo
+    user: jumbo_user

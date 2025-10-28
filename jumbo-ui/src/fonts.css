@@ -1,0 +1,29 @@
+/* Briskey Font Styles */
+/* Add your Briskey font files to src/assets/fonts/ folder and uncomment below */
+
+/*
+@font-face {
+  font-family: 'Briskey';
+  src: url('./assets/fonts/Briskey.woff2') format('woff2'),
+       url('./assets/fonts/Briskey.woff') format('woff'),
+       url('./assets/fonts/Briskey.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Briskey';
+  src: url('./assets/fonts/Briskey-Bold.woff2') format('woff2'),
+       url('./assets/fonts/Briskey-Bold.woff') format('woff'),
+       url('./assets/fonts/Briskey-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* Apply Briskey font globally to specific elements */
+.briskey-font {
+  font-family: 'Briskey', 'Bricolage Grotesque', 'Kalam', sans-serif;
+}
