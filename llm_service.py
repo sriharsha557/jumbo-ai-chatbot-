@@ -21,7 +21,8 @@ class LLMService:
                 import os
                 os.environ["GROQ_API_KEY"] = config.llm.api_key
                 from groq import Groq
-                self.client = Groq()
+                # Simple initialization without extra parameters
+                self.client = Groq(api_key=config.llm.api_key)
                 logger.info("Groq LLM initialized successfully")
                 print("✓ Groq LLM initialized successfully")
             except Exception as e:

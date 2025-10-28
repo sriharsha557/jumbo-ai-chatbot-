@@ -297,9 +297,5 @@ def main():
 # Create app instance for testing
 app = create_app()
 
-@app.route('/health')
-def health_check():
-    return {'status': 'healthy', 'service': 'jumbo-api'}, 200
-
 if __name__ == '__main__':
     main()

@@ -10,7 +10,11 @@ from datetime import datetime
 from chatbot import JumboChatbot
 from supabase_service import SupabaseService
 from services.personality_service import PersonalityService
-from services.emotion_service import get_emotion_detector
+try:
+    from services.emotion_service import get_emotion_detector
+except ImportError:
+    # Fallback to minimal emotion service for production
+    from services.emotion_service_minimal import get_emotion_detector
 from services.response_polisher import get_response_polisher
 from monitoring import logger, monitor_llm_request, monitor_database_query, metrics
 
