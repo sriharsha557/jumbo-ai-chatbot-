@@ -1,0 +1,25 @@
+# Core Flask dependencies
+flask==3.0.0
+flask-cors==4.0.0
+werkzeug==3.0.1
+
+# HTTP and networking
+requests==2.31.0
+urllib3==2.1.0
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# Database and storage
+supabase==2.22.1
+postgrest==2.22.1
+
+# LLM and AI (minimal)
+groq==0.4.2
+
+# Authentication and security
+pyjwt[crypto]==2.10.1
+cryptography==45.0.6
+
+# Production server
+gunicorn==21.2.0
