@@ -279,23 +279,29 @@ def create_app() -> Flask:
         # Get the origin from the request
         origin = request.headers.get('Origin')
         
-        # Allow specific origins or all origins for development
-        if origin and origin.startswith('http://localhost:'):
+        # Allow specific origins for production and development
+        allowed_origins = [
+            'http://localhost:3000',
+            'http://localhost:3001', 
+            'http://localhost:3002',
+            'https://hellojumbo.vercel.app',
+            'https://hellojumbo.xyz'
+        ]
+        
+        if origin in allowed_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+        elif origin and origin.startswith('http://localhost:'):
+            # Allow any localhost for development
             response.headers['Access-Control-Allow-Origin'] = origin
             response.headers['Access-Control-Allow-Credentials'] = 'true'
         else:
+            # Fallback for non-credential requests
             response.headers['Access-Control-Allow-Origin'] = '*'
         
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
         
-        # Log outgoing responses (excluding health checks)
-        if request.endpoint not in ['health_check', 'get_metrics']:
-            logger.debug("Outgoing response",
-                        method=request.method,
-                        endpoint=request.endpoint,
-                        status_code=response.status_code,
-                        cors_origin=response.headers.get('Access-Control-Allow-Origin'))
         return response
     
     return app
