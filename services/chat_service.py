@@ -48,6 +48,7 @@ class ChatService:
                 logger.info(f"Creating profile for new user: {user_id}")
                 # Create a basic profile for the user
                 success, message = self.supabase_service.create_user_profile(user_id, {
+                    'name': 'User',  # Required field
                     'display_name': 'User',
                     'preferred_name': 'friend',
                     'onboarding_completed': False

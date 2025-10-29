@@ -223,6 +223,7 @@ def create_onboarding_blueprint(supabase_service, auth_service):
                 logger.info(f"Creating profile for user during onboarding completion: {user['user_id']}")
                 # Create profile with onboarding data
                 create_data = {
+                    'name': user.get('name', 'User'),  # Required field
                     'display_name': user.get('name', 'User'),
                     'onboarding_completed': True,
                     'onboarding_data': final_onboarding_data

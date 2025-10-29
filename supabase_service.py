@@ -131,7 +131,7 @@ class SupabaseService:
         """Create user profile in profiles table"""
         try:
             data = {
-                "user_id": user_id,
+                "id": user_id,  # Use 'id' not 'user_id' to match schema
                 "created_at": datetime.utcnow().isoformat(),
                 **profile_data
             }
@@ -502,7 +502,7 @@ class SupabaseService:
             self.admin_client.table('user_memories').delete().eq('user_id', user_id).execute()
             
             # Delete profile
-            self.admin_client.table('profiles').delete().eq('user_id', user_id).execute()
+            self.admin_client.table('profiles').delete().eq('id', user_id).execute()
             
             return True, "User data deleted successfully"
             
