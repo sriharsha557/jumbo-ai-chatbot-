@@ -36,25 +36,44 @@ function ChatPage({ currentUser }) {
     try {
       // Get Supabase session for proper authentication
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       const headers = { 'Content-Type': 'application/json' };
-      
+
       // Add Authorization header if we have a session
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
       }
 
+      // Debug logging
+      console.log('🔍 Sending chat request:', {
+        url: `${API_URL}/chat/message`,
+        headers,
+        body: {
+          message,
+          conversation_context: conversationHistory,
+          user: currentUser
+        }
+      });
+
       const response = await fetch(`${API_URL}/chat/message`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message,
           conversation_context: conversationHistory,
           user: currentUser // Fallback user data
         })
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Chat API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      }
 
       const data = await response.json();
 
@@ -82,7 +101,7 @@ function ChatPage({ currentUser }) {
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
+
     if (!SpeechRecognition) {
       setIsSpeechSupported(false);
       return;
@@ -91,7 +110,7 @@ function ChatPage({ currentUser }) {
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = true;
-    
+
     const langMap = { 'te': 'te-IN', 'hi': 'hi-IN', 'en': 'en-IN' };
     recognition.lang = langMap[currentUser?.language || 'en'] || 'en-IN';
 
@@ -181,7 +200,7 @@ function ChatPage({ currentUser }) {
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
-    
+
     utterance.onend = () => {
       setScreenState('listening');
     };
@@ -258,11 +277,11 @@ function ChatPage({ currentUser }) {
           }}>
             <div style={styles.avatarInner}>
               {isMicActive ? (
-                <img src="/jumbo-animated.gif" alt="Listening" style={{width: '80px', height: '80px', borderRadius: '50%'}} />
+                <img src="/jumbo-animated.gif" alt="Listening" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
               ) : screenState === 'responding' ? (
-                <img src="/jumbo-animated.gif" alt="Speaking" style={{width: '80px', height: '80px', borderRadius: '50%'}} />
+                <img src="/jumbo-animated.gif" alt="Speaking" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
               ) : (
-                <img src="/jumbo-logo.png" alt="Jumbo" style={{width: '80px', height: '80px', borderRadius: '50%'}} />
+                <img src="/jumbo-logo.png" alt="Jumbo" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
               )}
             </div>
             {isMicActive && (
@@ -299,7 +318,7 @@ function ChatPage({ currentUser }) {
               transition: 'all 0.3s',
               opacity: !isSpeechSupported ? 0.5 : 1,
               cursor: !isSpeechSupported ? 'not-allowed' : 'pointer',
-              background: isMicActive 
+              background: isMicActive
                 ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
                 : `linear-gradient(135deg, ${theme.colors.primary[600]} 0%, ${theme.colors.primary[500]} 100%)`,
             }}
@@ -310,7 +329,7 @@ function ChatPage({ currentUser }) {
 
         <p style={styles.micStatus}>
           {!isSpeechSupported ? 'Speech recognition not supported' :
-           isMicActive ? 'Click to stop' : 'Click to start'}
+            isMicActive ? 'Click to stop' : 'Click to start'}
         </p>
 
         <div style={styles.textInputSection}>
@@ -416,7 +435,7 @@ const styles = {
     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
     border: '1px solid rgba(255, 255, 255, 0.3)',
     marginBottom: '32px',
-    },
+  },
   responseText: {
     color: '#374151',
     lineHeight: '1.625',
