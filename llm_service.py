@@ -18,29 +18,20 @@ class LLMService:
         
         if self.enabled:
             try:
-                import os
-                os.environ["GROQ_API_KEY"] = config.llm.api_key
+                # Clean import and initialization
                 from groq import Groq
-                # Simple initialization without extra parameters
+                
+                # Try the simplest possible initialization
                 self.client = Groq(api_key=config.llm.api_key)
+                
+                # Test the client with a simple call
                 logger.info("Groq LLM initialized successfully")
                 print("✓ Groq LLM initialized successfully")
-            except TypeError as e:
-                # Handle version compatibility issues
-                logger.warning(f"Groq init failed with TypeError: {e}, trying alternate method...")
-                try:
-                    from groq import Groq
-                    self.client = Groq()
-                    self.client.api_key = config.llm.api_key
-                    logger.info("Groq LLM initialized with alternate method")
-                    print("✓ Groq LLM initialized with alternate method")
-                except Exception as e2:
-                    logger.error(f"Failed to initialize Groq with alternate method: {e2}")
-                    print(f"✗ Failed to initialize Groq: {e2}")
-                    self.enabled = False
+                
             except Exception as e:
                 logger.error(f"Failed to initialize Groq: {e}")
                 print(f"✗ Failed to initialize Groq: {e}")
+                print(f"✗ LLM will be disabled, but chat will work with fallback responses")
                 self.enabled = False
         else:
             logger.warning("LLM is disabled - no API key found")
