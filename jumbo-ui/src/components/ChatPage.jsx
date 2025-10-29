@@ -5,7 +5,7 @@ import GradientBackground from './GradientBackground';
 
 import { auth, db, supabase } from '../lib/supabase';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api`;
 
 function ChatPage({ currentUser }) {
   const [screenState, setScreenState] = useState('listening');

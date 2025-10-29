@@ -17,8 +17,12 @@ function App() {
 
   const checkOnboardingStatus = async (userData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/onboarding/status', {
-        credentials: 'include' // Use session cookies
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/onboarding/status`, {
+        headers: {
+          'Authorization': `Bearer ${userData.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       });
       
       if (response.ok) {
@@ -94,15 +98,8 @@ function App() {
           
           setCurrentUser(userData);
           
-          // Check onboarding status
-          const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
-          if (storedOnboardingStatus === 'true') {
-            setCurrentPage('chat');
-            setNeedsOnboarding(false);
-          } else {
-            setCurrentPage('onboarding');
-            setNeedsOnboarding(true);
-          }
+          // Check onboarding status from backend
+          await checkOnboardingStatus(userData);
         } else {
           // Check if user is stored in localStorage (fallback)
           const storedUser = localStorage.getItem('jumbo_user');
@@ -112,14 +109,8 @@ function App() {
             const userData = JSON.parse(storedUser);
             setCurrentUser(userData);
             
-            // Check onboarding status
-            if (storedOnboardingStatus === 'true') {
-              setCurrentPage('chat');
-              setNeedsOnboarding(false);
-            } else {
-              setCurrentPage('onboarding');
-              setNeedsOnboarding(true);
-            }
+            // Check onboarding status from backend
+            await checkOnboardingStatus(userData);
           }
         }
 

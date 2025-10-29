@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 // import { auth } from '../lib/supabase'; // Uncomment when Supabase is configured
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api`;
 
 function AuthPage({ onUserLogin }) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);

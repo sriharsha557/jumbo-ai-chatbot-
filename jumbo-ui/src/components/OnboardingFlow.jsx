@@ -88,7 +88,32 @@ const OnboardingFlow = ({ onComplete }) => {
       
       console.log('Completing onboarding with data:', finalOnboardingData);
       
-      // Store in localStorage
+      // Save to backend
+      try {
+        const storedUser = localStorage.getItem('jumbo_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          
+          const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/onboarding/complete`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${userData.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(finalOnboardingData)
+          });
+          
+          if (response.ok) {
+            console.log('✅ Onboarding saved to backend');
+          } else {
+            console.warn('⚠️ Failed to save onboarding to backend, using localStorage fallback');
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Backend save failed, using localStorage fallback:', error);
+      }
+      
+      // Store in localStorage (fallback)
       localStorage.setItem('jumbo_onboarding_data', JSON.stringify(finalOnboardingData));
       localStorage.setItem('jumbo_onboarding_completed', 'true');
       
