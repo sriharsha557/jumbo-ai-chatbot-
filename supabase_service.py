@@ -136,7 +136,8 @@ class SupabaseService:
                 **profile_data
             }
             
-            response = self.supabase.table('profiles').insert(data).execute()
+            # Use admin client to bypass RLS for profile creation
+            response = self.admin_client.table('profiles').insert(data).execute()
             
             if response.data:
                 return True, "Profile created successfully"
