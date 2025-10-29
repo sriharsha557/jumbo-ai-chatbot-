@@ -217,14 +217,24 @@ def create_onboarding_blueprint(supabase_service, auth_service):
             data = request.json
             final_onboarding_data = data.get('onboarding_data', {})
             
-            # Mark onboarding as completed
-            update_data = {
-                'onboarding_completed': True,
-                'onboarding_data': final_onboarding_data
-            }
-            
-            # Save to database
-            success, message = supabase_service.update_user_profile(user['user_id'], update_data)
+            # Check if user profile exists, create if not
+            existing_profile = supabase_service.get_user_profile(user['user_id'])
+            if not existing_profile:
+                logger.info(f"Creating profile for user during onboarding completion: {user['user_id']}")
+                # Create profile with onboarding data
+                create_data = {
+                    'display_name': user.get('name', 'User'),
+                    'onboarding_completed': True,
+                    'onboarding_data': final_onboarding_data
+                }
+                success, message = supabase_service.create_user_profile(user['user_id'], create_data)
+            else:
+                # Update existing profile
+                update_data = {
+                    'onboarding_completed': True,
+                    'onboarding_data': final_onboarding_data
+                }
+                success, message = supabase_service.update_user_profile(user['user_id'], update_data)
             
             if success:
                 logger.info(f"User {user['user_id']} completed onboarding")
