@@ -42,10 +42,24 @@ class ChatService:
             Tuple of (response, metadata)
         """
         try:
-            # Get user profile from database
+            # Get user profile from database, create if doesn't exist
             user_profile = self._get_user_profile(user_id)
             if not user_profile:
-                raise ValueError(f"User profile not found: {user_id}")
+                logger.info(f"Creating profile for new user: {user_id}")
+                # Create a basic profile for the user
+                success, message = self.supabase_service.create_user_profile(user_id, {
+                    'display_name': 'User',
+                    'preferred_name': 'friend',
+                    'onboarding_completed': False
+                })
+                if success:
+                    user_profile = self._get_user_profile(user_id)
+                else:
+                    logger.error(f"Failed to create user profile: {message}")
+                    raise ValueError(f"Could not create user profile: {user_id}")
+                
+                if not user_profile:
+                    raise ValueError(f"User profile creation failed: {user_id}")
             
             # Set up chatbot with user context (stateless)
             self._setup_chatbot_context(user_profile)
