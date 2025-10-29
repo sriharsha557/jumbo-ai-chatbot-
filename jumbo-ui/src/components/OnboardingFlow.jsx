@@ -94,7 +94,12 @@ const OnboardingFlow = ({ onComplete }) => {
         if (storedUser) {
           const userData = JSON.parse(storedUser);
           
-          const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/onboarding/complete`, {
+          // Use environment variable for production
+          const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+          console.log('🔍 API URL being used:', apiUrl);
+          console.log('🔍 Full URL:', `${apiUrl}/onboarding/complete`);
+          
+          const response = await fetch(`${apiUrl}/onboarding/complete`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${userData.access_token}`,

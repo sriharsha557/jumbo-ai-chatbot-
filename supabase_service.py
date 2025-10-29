@@ -106,6 +106,24 @@ class SupabaseService:
         except Exception as e:
             logger.error(f"Get user error: {e}")
             return None
+    
+    def get_current_user_from_token(self, access_token: str) -> Optional[Dict]:
+        """Get current user from access token"""
+        try:
+            # Validate the token with Supabase
+            user_response = self.supabase.auth.get_user(access_token)
+            if user_response and user_response.user:
+                user = user_response.user
+                return {
+                    "user_id": user.id,
+                    "email": user.email,
+                    "created_at": user.created_at,
+                    "user_metadata": user.user_metadata
+                }
+            return None
+        except Exception as e:
+            logger.error(f"Get user from token error: {e}")
+            return None
 
     # ==================== USER PROFILES ====================
     

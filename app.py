@@ -5,7 +5,7 @@ Stateless, monitored, and properly structured for production deployment
 
 import os
 import sys
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -46,8 +46,37 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config['SECRET_KEY'] = config.secret_key
     
-    # Setup CORS
-    CORS(app, origins=config.cors_origins)
+    # Setup CORS using Flask-CORS with explicit configuration (like Express example)
+    # Setup CORS with environment-specific origins
+    cors_origins = config.cors_origins
+    if config.environment == config.environment.PRODUCTION:
+        # Add production frontend URL
+        production_frontend = os.getenv('FRONTEND_URL', '')
+        if production_frontend:
+            cors_origins.append(production_frontend)
+    
+    CORS(app, resources={
+        r"/*": {
+            "origins": cors_origins,
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
+            "supports_credentials": True
+        }
+    })
+    
+    # Add explicit OPTIONS handler for all routes (like Express app.options("*", ...))
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            response = make_response()
+            response.headers.add("Access-Control-Allow-Origin", "http://localhost:3002")
+            response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With")
+            response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+            response.headers.add("Access-Control-Allow-Credentials", "true")
+            return response
+    
+    # Log CORS configuration
+    logger.info("CORS configured for specific origins: localhost:3002, 3001, 3000")
     
     # Setup error tracking
     setup_sentry()
@@ -74,7 +103,8 @@ def create_app() -> Flask:
         logger.info("Services initialized successfully",
                    environment=config.environment.value,
                    debug=config.debug,
-                   memory_system_enabled=True)
+                   memory_system_enabled=True,
+                   cors_origins=config.cors_origins)
         
     except Exception as e:
         logger.error("Failed to initialize services", error=e)
@@ -244,13 +274,28 @@ def create_app() -> Flask:
                         user_agent=request.headers.get('User-Agent', ''))
     
     @app.after_request
-    def after_request(response):
-        """Log outgoing responses"""
+    def add_cors_headers(response):
+        """Add CORS headers to all responses"""
+        # Get the origin from the request
+        origin = request.headers.get('Origin')
+        
+        # Allow specific origins or all origins for development
+        if origin and origin.startswith('http://localhost:'):
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+        else:
+            response.headers['Access-Control-Allow-Origin'] = '*'
+        
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        
+        # Log outgoing responses (excluding health checks)
         if request.endpoint not in ['health_check', 'get_metrics']:
             logger.debug("Outgoing response",
                         method=request.method,
                         endpoint=request.endpoint,
-                        status_code=response.status_code)
+                        status_code=response.status_code,
+                        cors_origin=response.headers.get('Access-Control-Allow-Origin'))
         return response
     
     return app

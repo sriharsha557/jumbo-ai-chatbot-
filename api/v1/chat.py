@@ -15,10 +15,14 @@ def create_chat_blueprint(chat_service: ChatService, auth_service: AuthService) 
     
     chat_bp = Blueprint('chat_v1', __name__)
     
-    @chat_bp.route('/message', methods=['POST'])
+    @chat_bp.route('/message', methods=['POST', 'OPTIONS'])
     @monitor_endpoint('chat_message')
     def send_message():
         """Send chat message"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Authenticate user
             is_authenticated, user_data, error_message = auth_service.require_auth(request)
@@ -84,10 +88,14 @@ def create_chat_blueprint(chat_service: ChatService, auth_service: AuthService) 
                 'message': 'Internal server error'
             }), 500
     
-    @chat_bp.route('/history', methods=['GET'])
+    @chat_bp.route('/history', methods=['GET', 'OPTIONS'])
     @monitor_endpoint('chat_history')
     def get_conversation_history():
         """Get conversation history"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Authenticate user
             is_authenticated, user_data, error_message = auth_service.require_auth(request)
@@ -117,10 +125,14 @@ def create_chat_blueprint(chat_service: ChatService, auth_service: AuthService) 
                 'message': 'Internal server error'
             }), 500
     
-    @chat_bp.route('/context', methods=['GET'])
+    @chat_bp.route('/context', methods=['GET', 'OPTIONS'])
     @monitor_endpoint('chat_context')
     def get_chat_context():
         """Get chat context for user (recent conversations, preferences, etc.)"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Authenticate user
             is_authenticated, user_data, error_message = auth_service.require_auth(request)

@@ -23,9 +23,13 @@ def create_onboarding_blueprint(supabase_service, auth_service):
         access_token = auth_header.split(' ')[1]
         return auth_service.get_current_user(access_token)
     
-    @onboarding_bp.route('/status', methods=['GET'])
+    @onboarding_bp.route('/status', methods=['GET', 'OPTIONS'])
     def get_onboarding_status():
         """Check if user has completed onboarding"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Get current user
             user = get_authenticated_user()
@@ -78,9 +82,13 @@ def create_onboarding_blueprint(supabase_service, auth_service):
                 'message': 'Failed to get onboarding status'
             }), 500
     
-    @onboarding_bp.route('/step', methods=['POST'])
+    @onboarding_bp.route('/step', methods=['POST', 'OPTIONS'])
     def save_onboarding_step():
         """Save data from a specific onboarding step"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Get current user
             user = get_authenticated_user()
@@ -190,9 +198,13 @@ def create_onboarding_blueprint(supabase_service, auth_service):
                 'message': 'Failed to save onboarding step'
             }), 500
     
-    @onboarding_bp.route('/complete', methods=['POST'])
+    @onboarding_bp.route('/complete', methods=['POST', 'OPTIONS'])
     def complete_onboarding():
         """Mark onboarding as completed"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
+            
         try:
             # Get current user
             user = get_authenticated_user()
