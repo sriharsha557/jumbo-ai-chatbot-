@@ -151,7 +151,8 @@ class SupabaseService:
     def get_user_profile(self, user_id: str) -> Optional[Dict]:
         """Get user profile by user_id"""
         try:
-            response = self.supabase.table('profiles').select("*").eq('id', user_id).execute()
+            # Use admin client to bypass RLS for profile reading in backend operations
+            response = self.admin_client.table('profiles').select("*").eq('id', user_id).execute()
             
             if response.data and len(response.data) > 0:
                 return response.data[0]
