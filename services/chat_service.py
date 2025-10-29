@@ -88,10 +88,16 @@ class ChatService:
             
             # Detect emotion if not provided
             if emotion is None:
-                emotion_result = self.emotion_detector.detect_emotion(message)
-                emotion = emotion_result['emotion']
-                emotion_confidence = emotion_result['confidence']
-                emotion_method = emotion_result['method']
+                emotion_scores = self.emotion_detector.detect_emotion(message)
+                if emotion_scores:
+                    # Get the dominant emotion
+                    emotion = max(emotion_scores.items(), key=lambda x: x[1])[0]
+                    emotion_confidence = emotion_scores[emotion]
+                    emotion_method = "keyword_detection"
+                else:
+                    emotion = "neutral"
+                    emotion_confidence = 1.0
+                    emotion_method = "default"
                 logger.info(f"Detected emotion: {emotion} (confidence: {emotion_confidence:.2f}, method: {emotion_method})")
             else:
                 emotion_confidence = 1.0
