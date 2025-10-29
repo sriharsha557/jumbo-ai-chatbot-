@@ -5,7 +5,14 @@ import GradientBackground from './GradientBackground';
 
 import { auth, db, supabase } from '../lib/supabase';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+const API_URL = process.env.REACT_APP_API_URL || (() => {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ REACT_APP_API_URL not set in production! Check Vercel environment variables.');
+    throw new Error('API_URL not configured for production');
+  }
+  console.warn('⚠️ Using localhost fallback for development');
+  return 'http://localhost:5000/api/v1';
+})();
 
 function ChatPage({ currentUser }) {
   const [screenState, setScreenState] = useState('listening');

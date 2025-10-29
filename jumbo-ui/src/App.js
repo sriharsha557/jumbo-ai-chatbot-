@@ -17,7 +17,13 @@ function App() {
 
   const checkOnboardingStatus = async (userData) => {
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+      const apiUrl = process.env.REACT_APP_API_URL || (() => {
+        if (process.env.NODE_ENV === 'production') {
+          console.error('❌ REACT_APP_API_URL not set in production!');
+          throw new Error('API_URL not configured for production');
+        }
+        return 'http://localhost:5000/api/v1';
+      })();
       console.log('🔍 API URL being used:', apiUrl);
       
       const response = await fetch(`${apiUrl}/onboarding/status`, {
