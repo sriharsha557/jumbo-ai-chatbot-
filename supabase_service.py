@@ -417,7 +417,8 @@ class SupabaseService:
                 "context": mood_data.get('context', '')
             }
             
-            response = self.supabase.table('mood_history').insert(data).execute()
+            # Use admin client to bypass RLS for mood history
+            response = self.admin_client.table('mood_history').insert(data).execute()
             
             if response.data:
                 return True, "Mood history saved"

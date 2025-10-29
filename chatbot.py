@@ -408,7 +408,7 @@ class JumboChatbot:
             search_terms.extend(important_words[:5])  # Take first 5 important words
             
             if search_terms:
-                memories = supabase_service.search_user_memories(user_id, search_terms, limit)
+                memories = supabase_service.search_user_memories(user_id, search_terms)
                 return memories if memories else []
             
             return []
