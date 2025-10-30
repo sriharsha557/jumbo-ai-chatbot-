@@ -28,6 +28,9 @@ function LandingPage({ onGetStarted }) {
           .form-row {
             grid-template-columns: 1fr !important;
           }
+          .collaborate-options {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
       <div style={styles.content}>
@@ -124,6 +127,104 @@ function LandingPage({ onGetStarted }) {
           </div>
         </div>
 
+        {/* MVP Disclaimer Section */}
+        <div style={styles.mvpSection}>
+          <div style={styles.mvpBanner}>
+            <h3 style={styles.mvpTitle}>🚀 MVP Demo Version</h3>
+            <p style={styles.mvpDescription}>
+              This is a <strong>Minimum Viable Product (MVP)</strong> showcasing the core concept and architecture. 
+              Due to free-tier hosting limitations, some advanced features are simplified or disabled.
+            </p>
+          </div>
+          
+          <div style={styles.techStackSection}>
+            <h4 style={styles.techStackTitle}>🛠️ Tech Stack & Architecture</h4>
+            <div style={styles.techGrid}>
+              <div style={styles.techCategory}>
+                <h5 style={styles.techCategoryTitle}>Frontend</h5>
+                <ul style={styles.techList}>
+                  <li style={styles.techListItem}>React.js with modern hooks</li>
+                  <li style={styles.techListItem}>Responsive design & animations</li>
+                  <li style={styles.techListItem}>Real-time speech recognition</li>
+                  <li style={styles.techListItem}>Progressive Web App (PWA)</li>
+                </ul>
+              </div>
+              
+              <div style={styles.techCategory}>
+                <h5 style={styles.techCategoryTitle}>Backend</h5>
+                <ul style={styles.techList}>
+                  <li style={styles.techListItem}>Flask API with production architecture</li>
+                  <li style={styles.techListItem}>Stateless design for scalability</li>
+                  <li style={styles.techListItem}>Comprehensive error handling</li>
+                  <li style={styles.techListItem}>Monitoring & logging system</li>
+                </ul>
+              </div>
+              
+              <div style={styles.techCategory}>
+                <h5 style={styles.techCategoryTitle}>AI & Intelligence</h5>
+                <ul style={styles.techList}>
+                  <li style={styles.techListItem}>Groq LLM integration (Llama 3)</li>
+                  <li style={styles.techListItem}>Emotion detection system</li>
+                  <li style={styles.techListItem}>Personality-driven responses</li>
+                  <li style={styles.techListItem}>Memory & context management</li>
+                </ul>
+              </div>
+              
+              <div style={styles.techCategory}>
+                <h5 style={styles.techCategoryTitle}>Infrastructure</h5>
+                <ul style={styles.techList}>
+                  <li style={styles.techListItem}>Supabase (PostgreSQL + Auth)</li>
+                  <li style={styles.techListItem}>Vercel (Frontend hosting)</li>
+                  <li style={styles.techListItem}>Render (Backend hosting)</li>
+                  <li style={styles.techListItem}>Google OAuth integration</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div style={styles.limitationsSection}>
+            <h4 style={styles.limitationsTitle}>⚠️ Current MVP Limitations</h4>
+            <div style={styles.limitationsList}>
+              <div style={styles.limitation}>
+                <strong>Simplified Emotion Detection:</strong> Using keyword-based detection instead of advanced transformer models
+              </div>
+              <div style={styles.limitation}>
+                <strong>Basic Memory System:</strong> Core functionality present, advanced semantic search disabled
+              </div>
+              <div style={styles.limitation}>
+                <strong>Limited Concurrent Users:</strong> Free-tier hosting restricts simultaneous users
+              </div>
+              <div style={styles.limitation}>
+                <strong>Reduced Model Complexity:</strong> Using lighter AI models for faster response times
+              </div>
+            </div>
+          </div>
+          
+          <div style={styles.futureSection}>
+            <h4 style={styles.futureTitle}>🔮 Planned Enhancements</h4>
+            <div style={styles.futureGrid}>
+              <div style={styles.futureItem}>
+                <strong>Advanced Emotion AI:</strong> Transformer-based emotion detection with 95%+ accuracy
+              </div>
+              <div style={styles.futureItem}>
+                <strong>Semantic Memory:</strong> Vector-based memory search with contextual understanding
+              </div>
+              <div style={styles.futureItem}>
+                <strong>Multi-modal Input:</strong> Image, voice, and text processing capabilities
+              </div>
+              <div style={styles.futureItem}>
+                <strong>Personalized Models:</strong> Fine-tuned AI models for individual users
+              </div>
+              <div style={styles.futureItem}>
+                <strong>Real-time Analytics:</strong> Mood tracking and mental health insights
+              </div>
+              <div style={styles.futureItem}>
+                <strong>Mobile Apps:</strong> Native iOS and Android applications
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Collaborate Section */}
         <div style={styles.collaborateSection}>
           <h2 style={styles.sectionTitle}>Let's Collaborate</h2>
@@ -133,7 +234,7 @@ function LandingPage({ onGetStarted }) {
             we'd love to hear from you.
           </p>
           
-          <div style={styles.collaborateOptions}>
+          <div style={styles.collaborateOptions} className="collaborate-options">
             <div style={styles.collaborateOption}>
               <h4 style={styles.collaborateTitle}>🚀 Developers</h4>
               <p style={styles.collaborateText}>Help us build better AI experiences and contribute to open-source mental health technology.</p>
@@ -224,7 +325,7 @@ function LandingPage({ onGetStarted }) {
         {/* Footer */}
         <div style={styles.footer}>
           <p style={styles.footerText}>
-            Experience the future of AI companionship
+            © 2025 Sriharsha Siddam. All rights reserved. This website and its content, including the design, concept, and original ideas, are the intellectual property of Sriharsha Siddam. Unauthorized reproduction or use of any part of this website is strictly prohibited.
           </p>
         </div>
       </div>
@@ -341,10 +442,132 @@ const styles = {
     textAlign: 'center',
     maxWidth: '800px',
   },
+  mvpSection: {
+    marginBottom: '80px',
+    textAlign: 'center',
+    maxWidth: '1000px',
+  },
+  mvpBanner: {
+    background: 'rgba(255, 193, 7, 0.15)',
+    backdropFilter: 'blur(20px)',
+    borderRadius: '16px',
+    padding: '24px',
+    border: '2px solid rgba(255, 193, 7, 0.3)',
+    marginBottom: '40px',
+  },
+  mvpTitle: {
+    fontSize: '1.8rem',
+    fontWeight: '600',
+    color: '#fbbf24',
+    marginBottom: '12px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  mvpDescription: {
+    fontSize: '1.1rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: '1.6',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  techStackSection: {
+    marginBottom: '40px',
+  },
+  techStackTitle: {
+    fontSize: '1.6rem',
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: '24px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  techGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '24px',
+    marginBottom: '40px',
+  },
+  techCategory: {
+    background: 'rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(20px)',
+    borderRadius: '16px',
+    padding: '24px',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    textAlign: 'left',
+  },
+  techCategoryTitle: {
+    fontSize: '1.2rem',
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: '16px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  techList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+  },
+  techListItem: {
+    padding: '8px 0',
+    fontSize: '0.95rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  limitationsSection: {
+    marginBottom: '40px',
+  },
+  limitationsTitle: {
+    fontSize: '1.4rem',
+    fontWeight: '600',
+    color: '#f59e0b',
+    marginBottom: '20px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  limitationsList: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '16px',
+  },
+  limitation: {
+    background: 'rgba(245, 158, 11, 0.1)',
+    borderRadius: '12px',
+    padding: '16px',
+    border: '1px solid rgba(245, 158, 11, 0.3)',
+    fontSize: '0.95rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'left',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  futureSection: {
+    marginBottom: '40px',
+  },
+  futureTitle: {
+    fontSize: '1.4rem',
+    fontWeight: '600',
+    color: '#10b981',
+    marginBottom: '20px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  futureGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '16px',
+  },
+  futureItem: {
+    background: 'rgba(16, 185, 129, 0.1)',
+    borderRadius: '12px',
+    padding: '16px',
+    border: '1px solid rgba(16, 185, 129, 0.3)',
+    fontSize: '0.95rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'left',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
   collaborateSection: {
     marginBottom: '60px',
     textAlign: 'center',
     maxWidth: '800px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: '2.5rem',
@@ -386,8 +609,12 @@ const styles = {
   },
   collaborateOptions: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '24px',
+    marginBottom: '60px',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   collaborateOption: {
     background: 'rgba(255, 255, 255, 0.1)',
@@ -410,7 +637,7 @@ const styles = {
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
   contactFormSection: {
-    marginTop: '60px',
+    marginTop: '40px',
     maxWidth: '600px',
     width: '100%',
   },
