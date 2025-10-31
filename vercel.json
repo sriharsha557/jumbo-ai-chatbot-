@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd jumbo-ui && npm run build",
+  "outputDirectory": "jumbo-ui/build",
+  "installCommand": "cd jumbo-ui && npm install",
+  "devCommand": "cd jumbo-ui && npm start",
+  "framework": "create-react-app"
+}
