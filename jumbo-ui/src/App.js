@@ -14,9 +14,24 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
 
   const checkOnboardingStatus = async (userData) => {
+    setIsCheckingOnboarding(true);
+    
     try {
+      // First check localStorage for quick response
+      const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
+      
+      if (storedOnboardingStatus === 'true') {
+        console.log('✅ Onboarding completed (from localStorage)');
+        setCurrentPage('chat');
+        setNeedsOnboarding(false);
+        setIsCheckingOnboarding(false);
+        return;
+      }
+      
+      // If not in localStorage, check with API
       const apiUrl = process.env.REACT_APP_API_URL || (() => {
         if (process.env.NODE_ENV === 'production') {
           console.error('❌ REACT_APP_API_URL not set in production!');
@@ -24,7 +39,8 @@ function App() {
         }
         return 'http://localhost:5000/api/v1';
       })();
-      console.log('🔍 API URL being used:', apiUrl);
+      
+      console.log('🔍 Checking onboarding status with API:', apiUrl);
       
       const response = await fetch(`${apiUrl}/onboarding/status`, {
         headers: {
@@ -37,31 +53,48 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         if (data.completed) {
+          console.log('✅ Onboarding completed (from API)');
+          localStorage.setItem('jumbo_onboarding_completed', 'true');
           setCurrentPage('chat');
           setNeedsOnboarding(false);
         } else {
+          console.log('⏳ Onboarding needed');
           setCurrentPage('onboarding');
           setNeedsOnboarding(true);
         }
       } else {
-        // If onboarding API fails, assume onboarding needed
+        console.log('⚠️ API check failed, assuming onboarding needed');
         setCurrentPage('onboarding');
         setNeedsOnboarding(true);
       }
     } catch (error) {
-      console.log('Onboarding status check error:', error);
-      // Default to onboarding if check fails
-      setCurrentPage('onboarding');
-      setNeedsOnboarding(true);
+      console.log('❌ Onboarding status check error:', error);
+      // Check localStorage as fallback
+      const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
+      if (storedOnboardingStatus === 'true') {
+        console.log('✅ Using localStorage fallback - onboarding completed');
+        setCurrentPage('chat');
+        setNeedsOnboarding(false);
+      } else {
+        console.log('⏳ Using localStorage fallback - onboarding needed');
+        setCurrentPage('onboarding');
+        setNeedsOnboarding(true);
+      }
+    } finally {
+      setIsCheckingOnboarding(false);
     }
   };
 
   const handleOnboardingComplete = () => {
+    console.log('✅ Onboarding completed successfully');
+    
+    // Store onboarding completion status immediately
+    localStorage.setItem('jumbo_onboarding_completed', 'true');
+    
+    // Update state
     setNeedsOnboarding(false);
     setCurrentPage('chat');
-    
-    // Store onboarding completion status
-    localStorage.setItem('jumbo_onboarding_completed', 'true');
+    setIsCheckingOnboarding(false);
   };
 
   const handleLogout = async () => {
@@ -158,9 +191,18 @@ function App() {
 
         setIsLoading(false);
 
-        // Cleanup subscription on unmount
+        // Add window focus listener to prevent unnecessary re-checks
+        const handleWindowFocus = () => {
+          // Only log focus events, don't re-trigger onboarding checks
+          console.log('🔍 Window focused - maintaining current state');
+        };
+
+        window.addEventListener('focus', handleWindowFocus);
+
+        // Cleanup subscription and event listeners on unmount
         return () => {
           subscription.unsubscribe();
+          window.removeEventListener('focus', handleWindowFocus);
         };
       } catch (error) {
         console.log('Auth initialization error:', error);
@@ -189,19 +231,35 @@ function App() {
     setCurrentPage('auth');
   };
 
-  // Show loading state while checking for existing session
-  if (isLoading) {
+  // Show loading state while checking for existing session or onboarding status
+  if (isLoading || isCheckingOnboarding) {
     return (
       <div style={{ 
         display: 'flex', 
+        flexDirection: 'column',
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
         background: 'linear-gradient(135deg, #0c1426 0%, #0ea5e9 100%)',
         color: 'white',
-        fontSize: '18px'
+        fontSize: '18px',
+        gap: '16px'
       }}>
-        Loading Jumbo...
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '3px solid rgba(255, 255, 255, 0.3)',
+          borderTop: '3px solid white',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+        {isLoading ? 'Loading Jumbo...' : 'Verifying your progress...'}
       </div>
     );
   }
