@@ -23,13 +23,22 @@ function ChatPage({ currentUser }) {
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
   const [textInput, setTextInput] = useState('');
   const [conversationHistory, setConversationHistory] = useState([]);
-  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(() => {
+    // Load saved preference from localStorage, default to false (disabled)
+    const saved = localStorage.getItem('jumbo_speech_enabled');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
 
   const recognitionRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis);
   const isListeningRef = useRef(false);
   const silenceTimerRef = useRef(null);
   const finalTranscriptRef = useRef('');
+
+  // Save speech preference to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('jumbo_speech_enabled', JSON.stringify(isSpeechEnabled));
+  }, [isSpeechEnabled]);
 
   const handleSendMessage = useCallback(async (message) => {
     if (!message.trim() || !currentUser) return;
@@ -196,22 +205,46 @@ function ChatPage({ currentUser }) {
   }, [currentUser, handleSendMessage]);
 
   const speakResponse = (text) => {
+    // Always set screen state back to listening if speech is disabled
     if (!isSpeechEnabled) {
+      console.log('🔇 Speech disabled - showing text only');
       setScreenState('listening');
       return;
     }
     
-    setScreenState('responding');
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    utterance.onend = () => {
+    // Check if speech synthesis is available
+    if (!synthRef.current) {
+      console.warn('⚠️ Speech synthesis not available');
       setScreenState('listening');
-    };
+      return;
+    }
 
-    synthRef.current.speak(utterance);
+    try {
+      // Cancel any ongoing speech
+      synthRef.current.cancel();
+      
+      setScreenState('responding');
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      utterance.onend = () => {
+        console.log('🔊 Speech completed');
+        setScreenState('listening');
+      };
+
+      utterance.onerror = (event) => {
+        console.error('❌ Speech synthesis error:', event);
+        setScreenState('listening');
+      };
+
+      console.log('🔊 Speaking response:', isSpeechEnabled ? 'enabled' : 'disabled');
+      synthRef.current.speak(utterance);
+    } catch (error) {
+      console.error('❌ Error in speech synthesis:', error);
+      setScreenState('listening');
+    }
   };
 
   const toggleMic = () => {
@@ -260,6 +293,10 @@ function ChatPage({ currentUser }) {
         @keyframes ping {
           75%, 100% { transform: scale(2); opacity: 0; }
         }
+        @keyframes speechDisabled {
+          0%, 100% { opacity: 0.8; }
+          50% { opacity: 0.5; }
+        }
       `}</style>
 
       <div style={styles.content}>
@@ -301,7 +338,14 @@ function ChatPage({ currentUser }) {
 
         {currentResponse && (
           <div style={{ ...styles.responseBox, animation: 'fadeIn 0.5s' }}>
-            <p style={styles.responseText}>{currentResponse}</p>
+            <div style={styles.responseHeader}>
+              <p style={styles.responseText}>{currentResponse}</p>
+              {screenState === 'responding' && isSpeechEnabled && (
+                <div style={styles.speakingIndicator}>
+                  🔊 Speaking...
+                </div>
+              )}
+            </div>
             {metadata.mood && (
               <p style={styles.moodLabel}>Mood: {metadata.mood}</p>
             )}
@@ -333,14 +377,28 @@ function ChatPage({ currentUser }) {
           </button>
           
           <button
-            onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
+            onClick={() => {
+              const newState = !isSpeechEnabled;
+              setIsSpeechEnabled(newState);
+              console.log('🔊 Speech toggle:', newState ? 'enabled' : 'disabled');
+              
+              // Stop any current speech when disabling
+              if (!newState && synthRef.current) {
+                synthRef.current.cancel();
+                setScreenState('listening');
+              }
+            }}
             style={{
               ...styles.speechToggleButton,
               background: isSpeechEnabled
                 ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              transform: isSpeechEnabled ? 'scale(1)' : 'scale(0.95)',
+              opacity: isSpeechEnabled ? 1 : 0.8,
             }}
-            title={isSpeechEnabled ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+            title={isSpeechEnabled ? 'Click to disable speech output' : 'Click to enable speech output'}
+            aria-label={isSpeechEnabled ? 'Disable speech output' : 'Enable speech output'}
+            aria-pressed={isSpeechEnabled}
           >
             {isSpeechEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
           </button>
@@ -348,8 +406,8 @@ function ChatPage({ currentUser }) {
 
         <p style={styles.micStatus}>
           {!isSpeechSupported ? 'Speech recognition not supported' :
-            isMicActive ? 'Click to stop' : 'Click to start'} • 
-          Speech: {isSpeechEnabled ? 'ON' : 'OFF'}
+            isMicActive ? 'Click to stop listening' : 'Click to start listening'} • 
+          Audio: {isSpeechEnabled ? '🔊 ON' : '🔇 OFF'}
         </p>
 
         <div style={styles.textInputSection}>
@@ -456,6 +514,11 @@ const styles = {
     border: '2px solid rgba(30, 64, 175, 0.2)',
     marginBottom: '32px',
   },
+  responseHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
   responseText: {
     color: '#1e40af', // Blue color for better visibility
     lineHeight: '1.625',
@@ -463,6 +526,14 @@ const styles = {
     margin: 0,
     fontSize: '16px',
     fontWeight: '500',
+  },
+  speakingIndicator: {
+    fontSize: '12px',
+    color: '#10b981',
+    fontWeight: '600',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+    alignSelf: 'flex-end',
+    animation: 'pulse 1.5s infinite',
   },
   moodLabel: {
     fontSize: '12px',
@@ -514,6 +585,8 @@ const styles = {
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
+    position: 'relative',
+    overflow: 'hidden',
   },
   micStatus: {
     textAlign: 'center',
