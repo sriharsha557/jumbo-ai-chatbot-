@@ -297,6 +297,13 @@ function ChatPage({ currentUser }) {
           0%, 100% { opacity: 0.8; }
           50% { opacity: 0.5; }
         }
+        .text-input::placeholder {
+          color: rgba(30, 64, 175, 0.6) !important;
+        }
+        .text-input:focus {
+          border-color: rgba(30, 64, 175, 0.6) !important;
+          box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2) !important;
+        }
       `}</style>
 
       <div style={styles.content}>
@@ -418,6 +425,7 @@ function ChatPage({ currentUser }) {
             onKeyPress={(e) => e.key === 'Enter' && handleTextSubmit()}
             placeholder="Or type your message..."
             style={styles.textInput}
+            className="text-input"
           />
           <button
             onClick={handleTextSubmit}
@@ -609,9 +617,11 @@ const styles = {
     fontSize: '14px',
     background: 'rgba(255, 255, 255, 0.9)',
     backdropFilter: 'blur(10px)',
+    color: '#1e40af', // Blue text for visibility
     outline: 'none',
     transition: 'all 0.3s',
     boxSizing: 'border-box',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
   sendButton: {
     padding: '12px 24px',
