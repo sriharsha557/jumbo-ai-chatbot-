@@ -51,13 +51,8 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
     const randomIndex = Math.floor(Math.random() * INSPIRATIONAL_MESSAGES.length);
     setInspirationalMessage(INSPIRATIONAL_MESSAGES[randomIndex]);
     
-    // Check if user has existing mood data to show trend
-    try {
-      const existingMoods = JSON.parse(localStorage.getItem('jumbo_mood_history') || '[]');
-      setShowMoodTrend(existingMoods.length > 0);
-    } catch (error) {
-      console.error('Error checking mood history:', error);
-    }
+    // Always show mood trend section - it will handle empty state gracefully
+    setShowMoodTrend(true);
     
     // Fetch user's preferred name from profile
     fetchUserProfile();
