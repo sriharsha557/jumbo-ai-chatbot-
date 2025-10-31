@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../supabaseClient';
 import GradientBackground from './GradientBackground';
 import { theme } from '../theme/theme';
 import { Sparkles } from 'lucide-react';

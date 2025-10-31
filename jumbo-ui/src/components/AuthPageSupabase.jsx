@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { auth, supabase } from '../lib/supabase';
+import { supabase } from '../supabaseClient';
 import { theme } from '../theme/theme';
 import GradientBackground from './GradientBackground';
 import OAuthLoadingOverlay from './OAuthLoadingOverlay';

@@ -67,7 +67,7 @@ function App() {
   const handleLogout = async () => {
     try {
       // Use Supabase signOut for Google OAuth
-      const { supabase } = await import('./lib/supabase');
+      const { supabase } = await import('./supabaseClient');
       await supabase.auth.signOut();
     } catch (error) {
       console.log('Logout error:', error);
@@ -86,7 +86,7 @@ function App() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { supabase } = await import('./lib/supabase');
+        const { supabase } = await import('./supabaseClient');
         
         // Check for Supabase session (for Google OAuth)
         const { data: { session } } = await supabase.auth.getSession();
