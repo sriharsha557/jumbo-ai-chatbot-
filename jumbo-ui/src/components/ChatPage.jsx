@@ -3,7 +3,7 @@ import { Mic, MicOff, Sparkles, Send, Volume2, VolumeX } from 'lucide-react';
 import { theme } from '../theme/theme';
 import GradientBackground from './GradientBackground';
 
-import { auth, db, supabase } from '../lib/supabase';
+import { supabase } from '../supabaseClient';
 
 const API_URL = process.env.REACT_APP_API_URL || (() => {
   if (process.env.NODE_ENV === 'production') {
