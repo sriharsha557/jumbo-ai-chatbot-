@@ -1,0 +1,11 @@
+# Ignore frontend changes to prevent backend redeploy
+jumbo-ui/
+jumbo-mobile/
+*.md
+.git/
+.vercel/
+vercel.json
+.vercelignore
+
+# Only deploy when backend files change
+# This helps reduce unnecessary deployments
