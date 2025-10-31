@@ -58,6 +58,16 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
                 ...styles.navLink,
                 ...(currentPage === item.id ? styles.navLinkActive : {})
               }}
+              onMouseEnter={(e) => {
+                if (currentPage !== item.id) {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentPage !== item.id) {
+                  e.target.style.background = 'none';
+                }
+              }}
             >
               {item.label}
             </button>
@@ -71,6 +81,14 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
             onClick={onLogout}
             style={styles.logoutBtn}
             title="Logout"
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(239, 68, 68, 0.4)';
+              e.target.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'rgba(239, 68, 68, 0.2)';
+              e.target.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            }}
           >
             <LogOut size={18} />
           </button>
@@ -128,12 +146,12 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
 
 const styles = {
   navbar: {
-    background: 'rgba(255, 255, 255, 0.08)',
+    background: 'rgba(15, 23, 42, 0.85)', // More opaque dark background
     backdropFilter: 'blur(24px)',
     WebkitBackdropFilter: 'blur(24px)', // Safari support
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
     position: 'fixed',
     top: 0,
     left: 0,
@@ -180,14 +198,11 @@ const styles = {
   desktopNav: {
     display: 'flex',
     gap: '24px',
-    '@media (maxWidth: 768px)': {
-      display: 'none',
-    },
   },
   navLink: {
     background: 'none',
     border: 'none',
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.9)', // Brighter text
     fontSize: '16px',
     fontWeight: '500',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Briskey, sans-serif',
@@ -197,7 +212,7 @@ const styles = {
     transition: 'all 0.3s',
   },
   navLinkActive: {
-    background: 'rgba(255, 255, 255, 0.2)',
+    background: 'rgba(59, 130, 246, 0.3)', // Blue active background
     color: 'white',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Briskey, sans-serif',
   },
@@ -205,23 +220,18 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
-    '@media (max-width: 768px)': {
-      gap: '8px',
-    },
   },
   userName: {
-    color: 'white',
+    color: 'rgba(255, 255, 255, 0.95)', // Brighter username
     fontSize: '14px',
     fontWeight: '600',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
-    '@media (max-width: 768px)': {
-      display: 'none', // Hide username on mobile to save space
-    },
+    textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', // Add text shadow for better visibility
   },
   logoutBtn: {
-    background: 'rgba(255, 255, 255, 0.2)',
-    border: 'none',
-    color: 'white',
+    background: 'rgba(239, 68, 68, 0.2)', // Red logout button
+    border: '1px solid rgba(239, 68, 68, 0.3)',
+    color: 'rgba(255, 255, 255, 0.95)',
     padding: '8px 12px',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -236,9 +246,6 @@ const styles = {
     border: 'none',
     color: 'white',
     cursor: 'pointer',
-    '@media (maxWidth: 768px)': {
-      display: 'block',
-    },
   },
   mobileNav: {
     background: 'rgba(0, 0, 0, 0.1)',

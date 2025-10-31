@@ -38,6 +38,7 @@ from api.v1.chat import create_chat_blueprint
 from api.v1.profile import create_profile_blueprint
 from api.v1.memories import create_memories_blueprint
 from api.v1.onboarding import create_onboarding_blueprint
+from api.v1.mood import create_mood_blueprint
 
 def create_app() -> Flask:
     """Application factory pattern"""
@@ -184,6 +185,11 @@ def create_app() -> Flask:
         url_prefix=f'{api_prefix}/onboarding'
     )
     
+    app.register_blueprint(
+        create_mood_blueprint(supabase_service, auth_service),
+        url_prefix=f'{api_prefix}/mood'
+    )
+    
     # Core endpoints
     @app.route('/health', methods=['GET'])
     @monitor_endpoint('health_check')
@@ -222,6 +228,7 @@ def create_app() -> Flask:
                 'profile': f'{api_prefix}/profile',
                 'memories': f'{api_prefix}/memories',
                 'onboarding': f'{api_prefix}/onboarding',
+                'mood': f'{api_prefix}/mood',
                 'health': '/health',
                 'metrics': '/metrics' if config.monitoring.enable_metrics else None
             }
@@ -240,6 +247,7 @@ def create_app() -> Flask:
                 f'{api_prefix}/profile',
                 f'{api_prefix}/memories',
                 f'{api_prefix}/onboarding',
+                f'{api_prefix}/mood',
                 '/health',
                 '/info'
             ]
@@ -328,6 +336,7 @@ def main():
                        'profile': f'{config.api_prefix}/profile',
                        'memories': f'{config.api_prefix}/memories',
                        'onboarding': f'{config.api_prefix}/onboarding',
+                       'mood': f'{config.api_prefix}/mood',
                        'health': '/health',
                        'info': '/info',
                        'metrics': '/metrics' if config.monitoring.enable_metrics else None

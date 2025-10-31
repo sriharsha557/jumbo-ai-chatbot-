@@ -3,9 +3,8 @@ import Navigation from './components/Navigation';
 import ChatPage from './components/ChatPage';
 import AuthPage from './components/AuthPageSupabase';
 import LandingPage from './components/LandingPage';
-
 import OnboardingFlow from './components/OnboardingFlow';
-
+import WelcomePage from './components/WelcomePage';
 import ProfilePage from './components/ProfilePage';
 import './App.css';
 
@@ -15,6 +14,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
+  const [welcomeShownThisSession, setWelcomeShownThisSession] = useState(false);
 
   const checkOnboardingStatus = async (userData) => {
     setIsCheckingOnboarding(true);
@@ -25,7 +25,12 @@ function App() {
       
       if (storedOnboardingStatus === 'true') {
         console.log('✅ Onboarding completed (from localStorage)');
-        setCurrentPage('chat');
+        // Check if welcome page should be shown this session
+        if (!welcomeShownThisSession) {
+          setCurrentPage('welcome');
+        } else {
+          setCurrentPage('chat');
+        }
         setNeedsOnboarding(false);
         setIsCheckingOnboarding(false);
         return;
@@ -55,7 +60,12 @@ function App() {
         if (data.completed) {
           console.log('✅ Onboarding completed (from API)');
           localStorage.setItem('jumbo_onboarding_completed', 'true');
-          setCurrentPage('chat');
+          // Check if welcome page should be shown this session
+          if (!welcomeShownThisSession) {
+            setCurrentPage('welcome');
+          } else {
+            setCurrentPage('chat');
+          }
           setNeedsOnboarding(false);
         } else {
           console.log('⏳ Onboarding needed');
@@ -73,7 +83,12 @@ function App() {
       const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
       if (storedOnboardingStatus === 'true') {
         console.log('✅ Using localStorage fallback - onboarding completed');
-        setCurrentPage('chat');
+        // Check if welcome page should be shown this session
+        if (!welcomeShownThisSession) {
+          setCurrentPage('welcome');
+        } else {
+          setCurrentPage('chat');
+        }
         setNeedsOnboarding(false);
       } else {
         console.log('⏳ Using localStorage fallback - onboarding needed');
@@ -93,8 +108,24 @@ function App() {
     
     // Update state
     setNeedsOnboarding(false);
-    setCurrentPage('chat');
+    // After onboarding, go to welcome page
+    setCurrentPage('welcome');
     setIsCheckingOnboarding(false);
+  };
+
+  const handleWelcomeComplete = (moodData) => {
+    console.log('✅ Welcome page completed', moodData ? 'with mood data' : 'without mood data');
+    
+    // Mark welcome as shown for this session
+    setWelcomeShownThisSession(true);
+    
+    // Store mood data if provided
+    if (moodData) {
+      localStorage.setItem('jumbo_current_session_mood', JSON.stringify(moodData));
+    }
+    
+    // Navigate to chat
+    setCurrentPage('chat');
   };
 
   const handleLogout = async () => {
@@ -109,10 +140,13 @@ function App() {
     // Clear localStorage
     localStorage.removeItem('jumbo_user');
     localStorage.removeItem('jumbo_onboarding_completed');
+    localStorage.removeItem('jumbo_current_session_mood');
+    localStorage.removeItem('jumbo_mood_history');
     
     setCurrentUser(null);
     setCurrentPage('landing');
     setNeedsOnboarding(false);
+    setWelcomeShownThisSession(false);
   };
 
   // Initialize app - check for Supabase session and stored user
@@ -183,9 +217,12 @@ function App() {
           if (event === 'SIGNED_OUT') {
             localStorage.removeItem('jumbo_user');
             localStorage.removeItem('jumbo_onboarding_completed');
+            localStorage.removeItem('jumbo_current_session_mood');
+            localStorage.removeItem('jumbo_mood_history');
             setCurrentUser(null);
             setCurrentPage('landing');
             setNeedsOnboarding(false);
+            setWelcomeShownThisSession(false);
           }
         });
 
@@ -277,6 +314,11 @@ function App() {
     return <OnboardingFlow onComplete={handleOnboardingComplete} />;
   }
 
+  // If user should see welcome page, show it
+  if (currentPage === 'welcome') {
+    return <WelcomePage currentUser={currentUser} onContinueToChat={handleWelcomeComplete} />;
+  }
+
   // If user logged in, show main app with navigation
   return (
     <>
@@ -287,8 +329,13 @@ function App() {
         onLogout={handleLogout}
       />
       
-      <main style={{ paddingTop: '0' }}>
-        {currentPage === 'chat' && <ChatPage currentUser={currentUser} />}
+      <main style={{ paddingTop: '80px' }}>
+        {currentPage === 'chat' && (
+          <ChatPage 
+            currentUser={currentUser} 
+            sessionMoodData={JSON.parse(localStorage.getItem('jumbo_current_session_mood') || 'null')}
+          />
+        )}
         {currentPage === 'profile' && <ProfilePage currentUser={currentUser} />}
       </main>
     </>

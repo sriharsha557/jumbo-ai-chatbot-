@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Mic, MicOff, Sparkles, Send, Volume2, VolumeX } from 'lucide-react';
+import { Mic, Sparkles, Send, Volume2, VolumeX } from 'lucide-react';
 import { theme } from '../theme/theme';
 import GradientBackground from './GradientBackground';
+import { jumboVoice, speakAsJumbo } from '../utils/jumboVoice';
 
 import { supabase } from '../supabaseClient';
 
@@ -14,7 +15,7 @@ const API_URL = process.env.REACT_APP_API_URL || (() => {
   return 'http://localhost:5000/api/v1';
 })();
 
-function ChatPage({ currentUser }) {
+function ChatPage({ currentUser, sessionMoodData }) {
   const [screenState, setScreenState] = useState('listening');
   const [isMicActive, setIsMicActive] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -28,6 +29,18 @@ function ChatPage({ currentUser }) {
     const saved = localStorage.getItem('jumbo_speech_enabled');
     return saved !== null ? JSON.parse(saved) : false;
   });
+  const [messageCount, setMessageCount] = useState(0);
+  const [showFeedbackPrompt, setShowFeedbackPrompt] = useState(false);
+  const [feedbackDismissed, setFeedbackDismissed] = useState(() => {
+    return localStorage.getItem('jumbo_feedback_dismissed') === 'true';
+  });
+
+  // Google Form link for user feedback
+  const FEEDBACK_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfxefcAGmvA7X2ROcdCDmwrobS1OJgmDQreav0C_BMlkHhrew/viewform?usp=sharing&ouid=103846069431803692273';
+
+  const openFeedbackForm = () => {
+    window.open(FEEDBACK_FORM_URL, '_blank');
+  };
 
   const recognitionRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis);
@@ -39,6 +52,18 @@ function ChatPage({ currentUser }) {
   useEffect(() => {
     localStorage.setItem('jumbo_speech_enabled', JSON.stringify(isSpeechEnabled));
   }, [isSpeechEnabled]);
+
+  // Initialize Jumbo's voice when component mounts
+  useEffect(() => {
+    // Log Jumbo voice information for debugging
+    const voiceInfo = jumboVoice.getVoiceInfo();
+    console.log('🐘 Jumbo Voice System:', voiceInfo);
+    
+    // Initialize voice if not already done
+    if (!voiceInfo.isInitialized) {
+      jumboVoice.initializeVoice();
+    }
+  }, []);
 
   const handleSendMessage = useCallback(async (message) => {
     if (!message.trim() || !currentUser) return;
@@ -54,25 +79,31 @@ function ChatPage({ currentUser }) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
       }
 
+      // Prepare request body with mood context
+      const requestBody = {
+        message,
+        conversation_context: conversationHistory,
+        user: currentUser,
+        // Include mood data for context-aware responses
+        mood_context: sessionMoodData ? {
+          current_mood: sessionMoodData.mood_type,
+          mood_timestamp: sessionMoodData.timestamp,
+          session_id: sessionMoodData.session_id
+        } : null
+      };
+
       // Debug logging
       console.log('🔍 Sending chat request:', {
         url: `${API_URL}/chat/message`,
         headers,
-        body: {
-          message,
-          conversation_context: conversationHistory,
-          user: currentUser
-        }
+        body: requestBody,
+        mood_context: requestBody.mood_context ? 'included' : 'none'
       });
 
       const response = await fetch(`${API_URL}/chat/message`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          message,
-          conversation_context: conversationHistory,
-          user: currentUser // Fallback user data
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -96,6 +127,15 @@ function ChatPage({ currentUser }) {
           { role: 'user', content: message },
           { role: 'assistant', content: data.response }
         ]);
+
+        // Increment message count and check for feedback prompt
+        const newCount = messageCount + 1;
+        setMessageCount(newCount);
+        
+        // Show feedback prompt after 5-6 exchanges (10-12 messages total)
+        if (newCount >= 10 && !feedbackDismissed && !showFeedbackPrompt) {
+          setShowFeedbackPrompt(true);
+        }
 
         speakResponse(data.response);
       } else {
@@ -204,7 +244,7 @@ function ChatPage({ currentUser }) {
     };
   }, [currentUser, handleSendMessage]);
 
-  const speakResponse = (text) => {
+  const speakResponse = async (text) => {
     // Always set screen state back to listening if speech is disabled
     if (!isSpeechEnabled) {
       console.log('🔇 Speech disabled - showing text only');
@@ -212,37 +252,33 @@ function ChatPage({ currentUser }) {
       return;
     }
     
-    // Check if speech synthesis is available
-    if (!synthRef.current) {
-      console.warn('⚠️ Speech synthesis not available');
+    // Check if Jumbo's voice is available
+    if (!jumboVoice.isAvailable()) {
+      console.warn('⚠️ Jumbo voice not available');
       setScreenState('listening');
       return;
     }
 
     try {
-      // Cancel any ongoing speech
-      synthRef.current.cancel();
-      
       setScreenState('responding');
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = 1;
+      
+      // Use Jumbo's gentle voice to speak the response
+      await speakAsJumbo(text, {
+        onStart: () => {
+          console.log('🐘 Jumbo begins speaking with gentle voice');
+        },
+        onEnd: () => {
+          console.log('🐘 Jumbo finished speaking');
+          setScreenState('listening');
+        },
+        onError: (event) => {
+          console.error('❌ Jumbo speech synthesis error:', event);
+          setScreenState('listening');
+        }
+      });
 
-      utterance.onend = () => {
-        console.log('🔊 Speech completed');
-        setScreenState('listening');
-      };
-
-      utterance.onerror = (event) => {
-        console.error('❌ Speech synthesis error:', event);
-        setScreenState('listening');
-      };
-
-      console.log('🔊 Speaking response:', isSpeechEnabled ? 'enabled' : 'disabled');
-      synthRef.current.speak(utterance);
     } catch (error) {
-      console.error('❌ Error in speech synthesis:', error);
+      console.error('❌ Error in Jumbo speech synthesis:', error);
       setScreenState('listening');
     }
   };
@@ -297,6 +333,19 @@ function ChatPage({ currentUser }) {
           0%, 100% { opacity: 0.8; }
           50% { opacity: 0.5; }
         }
+        @keyframes volumeLevel {
+          0%, 100% { 
+            height: 4px; 
+            opacity: 0.6; 
+          }
+          50% { 
+            height: 12px; 
+            opacity: 1; 
+          }
+        }
+        .volume-bar {
+          animation: volumeLevel 0.8s ease-in-out infinite;
+        }
         .text-input::placeholder {
           color: rgba(30, 64, 175, 0.6) !important;
         }
@@ -317,6 +366,19 @@ function ChatPage({ currentUser }) {
           <p style={styles.headerSubtitle}>
             {isMicActive ? 'Listening... speak now!' : 'Click the microphone and share your thoughts'}
           </p>
+          {sessionMoodData && (
+            <div style={styles.moodIndicator}>
+              <span style={styles.moodEmoji}>
+                {sessionMoodData.mood_type === 'very_happy' ? '😀' :
+                 sessionMoodData.mood_type === 'happy' ? '🙂' :
+                 sessionMoodData.mood_type === 'neutral' ? '😐' :
+                 sessionMoodData.mood_type === 'sad' ? '🙁' : '😢'}
+              </span>
+              <span style={styles.moodText}>
+                Current mood: {sessionMoodData.mood_type.replace('_', ' ')}
+              </span>
+            </div>
+          )}
         </div>
 
         <div style={styles.avatarSection}>
@@ -359,6 +421,33 @@ function ChatPage({ currentUser }) {
           </div>
         )}
 
+        {/* Feedback Prompt */}
+        {showFeedbackPrompt && (
+          <div style={styles.feedbackPrompt}>
+            <p style={styles.feedbackText}>
+              🧡 Thanks for chatting with Jumbo! We'd love to hear how your experience has been so far.
+            </p>
+            <div style={styles.feedbackActions}>
+              <button 
+                onClick={openFeedbackForm}
+                style={styles.feedbackButton}
+              >
+                Give Feedback
+              </button>
+              <button 
+                onClick={() => {
+                  setShowFeedbackPrompt(false);
+                  setFeedbackDismissed(true);
+                  localStorage.setItem('jumbo_feedback_dismissed', 'true');
+                }}
+                style={styles.dismissButton}
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        )}
+
         {transcript && (
           <div style={styles.transcriptBox}>
             <p style={styles.transcriptText}>{transcript}</p>
@@ -376,22 +465,34 @@ function ChatPage({ currentUser }) {
               opacity: !isSpeechSupported ? 0.5 : 1,
               cursor: !isSpeechSupported ? 'not-allowed' : 'pointer',
               background: isMicActive
-                ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                 : `linear-gradient(135deg, ${theme.colors.primary[600]} 0%, ${theme.colors.primary[500]} 100%)`,
+              boxShadow: isMicActive 
+                ? '0 0 20px rgba(16, 185, 129, 0.4), 0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             }}
           >
-            {isMicActive ? <MicOff size={32} /> : <Mic size={32} />}
+            <div style={styles.micIconContainer}>
+              <Mic size={32} />
+              {isMicActive && (
+                <div style={styles.volumeLevels}>
+                  <div style={{...styles.volumeBar, animationDelay: '0s'}} className="volume-bar"></div>
+                  <div style={{...styles.volumeBar, animationDelay: '0.1s'}} className="volume-bar"></div>
+                  <div style={{...styles.volumeBar, animationDelay: '0.2s'}} className="volume-bar"></div>
+                </div>
+              )}
+            </div>
           </button>
           
           <button
             onClick={() => {
               const newState = !isSpeechEnabled;
               setIsSpeechEnabled(newState);
-              console.log('🔊 Speech toggle:', newState ? 'enabled' : 'disabled');
+              console.log('🐘 Jumbo speech toggle:', newState ? 'enabled' : 'disabled');
               
               // Stop any current speech when disabling
-              if (!newState && synthRef.current) {
-                synthRef.current.cancel();
+              if (!newState) {
+                jumboVoice.stop();
                 setScreenState('listening');
               }
             }}
@@ -413,7 +514,7 @@ function ChatPage({ currentUser }) {
 
         <p style={styles.micStatus}>
           {!isSpeechSupported ? 'Speech recognition not supported' :
-            isMicActive ? 'Click to stop listening' : 'Click to start listening'} • 
+            isMicActive ? '🎤 Listening... Speak now!' : 'Click microphone to speak'} • 
           Audio: {isSpeechEnabled ? '🔊 ON' : '🔇 OFF'}
         </p>
 
@@ -439,6 +540,19 @@ function ChatPage({ currentUser }) {
             <Send size={20} />
           </button>
         </div>
+
+        {/* Footer Feedback Link */}
+        {!showFeedbackPrompt && !feedbackDismissed && (
+          <div style={styles.feedbackFooter}>
+            Have feedback? 
+            <button 
+              onClick={openFeedbackForm}
+              style={styles.feedbackFooterLink}
+            >
+              Share it here 💬
+            </button>
+          </div>
+        )}
       </div>
     </GradientBackground>
   );
@@ -480,6 +594,25 @@ const styles = {
     fontSize: '14px',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
     margin: '8px 0 0 0',
+  },
+  moodIndicator: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '12px',
+    padding: '8px 12px',
+    background: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: '20px',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+  },
+  moodEmoji: {
+    fontSize: '16px',
+  },
+  moodText: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: '12px',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+    textTransform: 'capitalize',
   },
   avatarSection: {
     display: 'flex',
@@ -580,6 +713,31 @@ const styles = {
     justifyContent: 'center',
     color: 'white',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    position: 'relative',
+    overflow: 'visible',
+  },
+  micIconContainer: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  volumeLevels: {
+    position: 'absolute',
+    right: '-25px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    alignItems: 'end',
+    gap: '2px',
+    height: '16px',
+  },
+  volumeBar: {
+    width: '3px',
+    height: '4px',
+    background: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: '2px',
+    animation: 'volumeLevel 0.8s ease-in-out infinite',
   },
   speechToggleButton: {
     width: '50px',
@@ -595,6 +753,69 @@ const styles = {
     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
     position: 'relative',
     overflow: 'hidden',
+  },
+  feedbackPrompt: {
+    background: 'rgba(251, 146, 60, 0.1)',
+    backdropFilter: 'blur(20px)',
+    borderRadius: '16px',
+    padding: '20px',
+    border: '2px solid rgba(251, 146, 60, 0.3)',
+    marginBottom: '24px',
+    animation: 'fadeIn 0.5s ease',
+  },
+  feedbackText: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: '16px',
+    lineHeight: '1.5',
+    marginBottom: '16px',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  feedbackActions: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'center',
+  },
+  feedbackButton: {
+    background: 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  dismissButton: {
+    background: 'rgba(255, 255, 255, 0.1)',
+    color: 'rgba(255, 255, 255, 0.8)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '12px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  feedbackFooter: {
+    textAlign: 'center',
+    fontSize: '14px',
+    color: 'rgba(255, 255, 255, 0.6)',
+    marginTop: '16px',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  feedbackFooterLink: {
+    background: 'none',
+    border: 'none',
+    color: '#fb923c',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '500',
+    marginLeft: '4px',
+    textDecoration: 'underline',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
   micStatus: {
     textAlign: 'center',

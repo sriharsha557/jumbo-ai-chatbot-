@@ -155,6 +155,23 @@ function ProfilePage({ currentUser }) {
         .checkbox-group::-webkit-scrollbar-thumb:hover {
           background: rgba(139, 92, 246, 0.7);
         }
+        /* Fix dropdown option colors */
+        select option {
+          background: #1e293b !important;
+          color: white !important;
+        }
+        select {
+          color: white !important;
+        }
+        /* Ensure select text is visible */
+        .profile-select {
+          color: white !important;
+          background: rgba(255, 255, 255, 0.1) !important;
+        }
+        .profile-select option {
+          background: #1e293b !important;
+          color: white !important;
+        }
       `}</style>
       <div style={styles.content}>
         <div style={styles.profileCard}>
@@ -233,6 +250,7 @@ function ProfilePage({ currentUser }) {
                       value={editedData.pronouns || ''}
                       onChange={(e) => handleInputChange('pronouns', e.target.value)}
                       style={styles.select}
+                      className="profile-select"
                     >
                       <option value="">Select pronouns</option>
                       <option value="he/him">He/Him</option>
@@ -252,6 +270,7 @@ function ProfilePage({ currentUser }) {
                       value={editedData.preferred_language || 'en'}
                       onChange={(e) => handleInputChange('preferred_language', e.target.value)}
                       style={styles.select}
+                      className="profile-select"
                     >
                       <option value="en">English</option>
                       <option value="hi">Hindi</option>
@@ -436,6 +455,7 @@ function ProfilePage({ currentUser }) {
                       value={editedData.checkin_frequency || ''}
                       onChange={(e) => handleInputChange('checkin_frequency', e.target.value)}
                       style={styles.select}
+                      className="profile-select"
                     >
                       <option value="">Select frequency</option>
                       <option value="daily">Daily</option>
@@ -460,6 +480,7 @@ function ProfilePage({ currentUser }) {
                         value={editedData.checkin_time || ''}
                         onChange={(e) => handleInputChange('checkin_time', e.target.value)}
                         style={styles.select}
+                        className="profile-select"
                       >
                         <option value="">Select time preference</option>
                         <option value="morning">Morning (8:00 AM - 12:00 PM)</option>

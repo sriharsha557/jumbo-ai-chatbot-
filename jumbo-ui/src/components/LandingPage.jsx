@@ -84,6 +84,26 @@ function LandingPage({ onGetStarted }) {
           .landing-contact-form {
             padding: 0 8px !important;
           }
+          .trust-badges {
+            gap: 8px !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .explainer-steps {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .explainer-step {
+            flex-direction: column !important;
+            text-align: center !important;
+            gap: 16px !important;
+          }
+          .explainer-title {
+            font-size: 2rem !important;
+          }
+          .explainer-subtitle {
+            font-size: 1rem !important;
+          }
         }
         
         @media (max-width: 480px) {
@@ -98,6 +118,21 @@ function LandingPage({ onGetStarted }) {
           }
           .landing-features {
             gap: 16px !important;
+          }
+          .trust-badges {
+            gap: 6px !important;
+          }
+          .trust-badge {
+            font-size: 12px !important;
+            padding: 6px 12px !important;
+          }
+          .explainer-title {
+            font-size: 1.8rem !important;
+          }
+          .step-number {
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 18px !important;
           }
         }
         }
@@ -122,6 +157,10 @@ function LandingPage({ onGetStarted }) {
             Your AI-powered emotional support companion with advanced conversation and memory capabilities
           </p>
           
+          <div style={styles.betaMessage}>
+            💛 Jumbo is growing! Join our beta and share your thoughts with us.
+          </div>
+          
           <button 
             onClick={onGetStarted}
             style={styles.ctaButton}
@@ -136,8 +175,57 @@ function LandingPage({ onGetStarted }) {
             }}
           >
             <Sparkles size={20} style={{ marginRight: '8px' }} />
-            Start Chatting with Jumbo
+            Start Your Journey - It's Free
           </button>
+          
+          <div style={styles.trustBadges} className="trust-badges">
+            <span style={styles.trustBadge} className="trust-badge">🔒 100% Private & Secure</span>
+            <span style={styles.trustBadge} className="trust-badge">🆓 Always Free to Use</span>
+            <span style={styles.trustBadge} className="trust-badge">⚡ No Setup Required</span>
+          </div>
+        </div>
+
+        {/* One-Screen Explainer */}
+        <div style={styles.explainerSection} className="landing-section">
+          <h2 style={styles.explainerTitle} className="explainer-title">How Jumbo Helps You Feel Better</h2>
+          <p style={styles.explainerSubtitle} className="explainer-subtitle">
+            Mental wellness shouldn't be complicated. Jumbo makes emotional support accessible, 
+            private, and available whenever you need it most.
+          </p>
+          
+          <div style={styles.explainerSteps} className="explainer-steps">
+            <div style={styles.explainerStep} className="explainer-step">
+              <div style={styles.stepNumber} className="step-number">1</div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Share Your Feelings</h3>
+                <p style={styles.stepDescription}>
+                  Talk to Jumbo about anything on your mind. No judgment, no pressure - just a caring listener.
+                </p>
+              </div>
+            </div>
+            
+            <div style={styles.explainerStep} className="explainer-step">
+              <div style={styles.stepNumber} className="step-number">2</div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Get Personalized Support</h3>
+                <p style={styles.stepDescription}>
+                  Jumbo understands your emotions and provides tailored responses to help you process and cope.
+                </p>
+              </div>
+            </div>
+            
+            <div style={styles.explainerStep} className="explainer-step">
+              <div style={styles.stepNumber} className="step-number">3</div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Build Emotional Resilience</h3>
+                <p style={styles.stepDescription}>
+                  Over time, Jumbo learns about you and helps develop healthy coping strategies and emotional awareness.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+
         </div>
 
         {/* Features Section */}
@@ -175,25 +263,74 @@ function LandingPage({ onGetStarted }) {
 
         {/* About Section */}
         <div style={styles.aboutSection} className="landing-section">
-          <h2 style={styles.sectionTitle}>About Jumbo</h2>
+          <h2 style={styles.sectionTitle}>Why Choose Jumbo for Your Mental Wellness?</h2>
           <p style={styles.sectionDescription}>
-            Jumbo is your caring emotional support companion powered by advanced AI technology. 
-            We understand that everyone needs someone to talk to, and Jumbo is here to listen, 
-            understand, and provide meaningful support whenever you need it.
+            Jumbo is designed specifically for mental wellness support, combining advanced AI with 
+            evidence-based emotional support techniques. We're committed to providing a safe, 
+            private, and effective space for your emotional well-being.
           </p>
           
           <div style={styles.aboutFeatures} className="landing-about-features">
             <div style={styles.aboutFeature} className="landing-about-feature">
-              <h4 style={styles.aboutFeatureTitle}>🔒 Privacy First</h4>
-              <p style={styles.aboutFeatureText}>Your conversations are private and secure. We don't share your data with anyone.</p>
+              <h4 style={styles.aboutFeatureTitle}>🔒 Privacy & Security</h4>
+              <p style={styles.aboutFeatureText}>
+                End-to-end encryption ensures your conversations remain completely private. 
+                We never share, sell, or analyze your personal data for advertising.
+              </p>
             </div>
             <div style={styles.aboutFeature} className="landing-about-feature">
-              <h4 style={styles.aboutFeatureTitle}>🧠 Smart Memory</h4>
-              <p style={styles.aboutFeatureText}>Each conversation helps Jumbo understand you better and provide more personalized support.</p>
+              <h4 style={styles.aboutFeatureTitle}>🧠 Evidence-Based Support</h4>
+              <p style={styles.aboutFeatureText}>
+                Our responses are grounded in cognitive behavioral therapy (CBT) and mindfulness 
+                techniques, validated by mental health professionals.
+              </p>
             </div>
             <div style={styles.aboutFeature} className="landing-about-feature">
               <h4 style={styles.aboutFeatureTitle}>🌍 Always Available</h4>
-              <p style={styles.aboutFeatureText}>24/7 emotional support whenever you need someone to talk to.</p>
+              <p style={styles.aboutFeatureText}>
+                24/7 emotional support when you need it most. No appointments, no waiting lists, 
+                no judgment - just immediate, caring support.
+              </p>
+            </div>
+            <div style={styles.aboutFeature} className="landing-about-feature">
+              <h4 style={styles.aboutFeatureTitle}>🎯 Personalized Care</h4>
+              <p style={styles.aboutFeatureText}>
+                Jumbo learns your communication style and emotional patterns to provide 
+                increasingly personalized and effective support over time.
+              </p>
+            </div>
+            <div style={styles.aboutFeature} className="landing-about-feature">
+              <h4 style={styles.aboutFeatureTitle}>🆓 Completely Free</h4>
+              <p style={styles.aboutFeatureText}>
+                Mental health support should be accessible to everyone. Jumbo is and will 
+                always remain free to use, with no hidden costs or premium tiers.
+              </p>
+            </div>
+            <div style={styles.aboutFeature} className="landing-about-feature">
+              <h4 style={styles.aboutFeatureTitle}>🤝 Professional Backup</h4>
+              <p style={styles.aboutFeatureText}>
+                While Jumbo provides excellent support, we always encourage seeking professional 
+                help for serious mental health concerns and provide resources when needed.
+              </p>
+            </div>
+          </div>
+          
+          {/* Important Disclaimer */}
+          <div style={styles.disclaimerBox}>
+            <h4 style={styles.disclaimerTitle}>Important Mental Health Disclaimer</h4>
+            <p style={styles.disclaimerText}>
+              <strong>Jumbo is an AI emotional support companion, not a replacement for professional mental health care.</strong> 
+              While Jumbo can provide valuable emotional support and coping strategies, it cannot diagnose, treat, 
+              or cure mental health conditions. If you're experiencing thoughts of self-harm, severe depression, 
+              or other serious mental health concerns, please contact a mental health professional immediately.
+            </p>
+            <div style={styles.emergencyContacts}>
+              <p style={styles.emergencyTitle}>Crisis Resources:</p>
+              <p style={styles.emergencyText}>
+                • <strong>AASRA Helpline (Pan India):</strong> 📞 91-9820466726<br/>
+                • <strong>Snehi Helpline:</strong> 📞 91-9582208181 (10 AM – 10 PM)<br/>
+                • <strong>Local emergency services:</strong> 112
+              </p>
             </div>
           </div>
         </div>
@@ -441,10 +578,21 @@ const styles = {
   subtitle: {
     fontSize: '1.25rem',
     color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: '40px',
+    marginBottom: '24px',
     maxWidth: '600px',
     lineHeight: '1.6',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  betaMessage: {
+    fontSize: '1rem',
+    color: '#fbbf24',
+    background: 'rgba(251, 191, 36, 0.1)',
+    border: '1px solid rgba(251, 191, 36, 0.3)',
+    borderRadius: '12px',
+    padding: '12px 20px',
+    marginBottom: '32px',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+    fontWeight: '500',
   },
   ctaButton: {
     display: 'inline-flex',
@@ -798,6 +946,133 @@ const styles = {
     transition: 'all 0.3s ease',
     boxShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.3)',
     marginTop: '10px',
+  },
+  trustBadges: {
+    display: 'flex',
+    gap: '16px',
+    marginTop: '24px',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  trustBadge: {
+    fontSize: '14px',
+    color: 'rgba(255, 255, 255, 0.9)',
+    background: 'rgba(255, 255, 255, 0.1)',
+    padding: '8px 16px',
+    borderRadius: '20px',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  explainerSection: {
+    marginBottom: '80px',
+    textAlign: 'center',
+    maxWidth: '1000px',
+  },
+  explainerTitle: {
+    fontSize: '2.5rem',
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: '16px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  explainerSubtitle: {
+    fontSize: '1.2rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: '48px',
+    maxWidth: '700px',
+    margin: '0 auto 48px',
+    lineHeight: '1.6',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  explainerSteps: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '32px',
+    marginBottom: '48px',
+  },
+  explainerStep: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '20px',
+    textAlign: 'left',
+    background: 'rgba(255, 255, 255, 0.05)',
+    padding: '24px',
+    borderRadius: '16px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+  },
+  stepNumber: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '20px',
+    fontWeight: '600',
+    flexShrink: 0,
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  stepContent: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: '1.3rem',
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: '8px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  stepDescription: {
+    fontSize: '1rem',
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: '1.5',
+    margin: 0,
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+
+  disclaimerBox: {
+    background: 'rgba(245, 158, 11, 0.1)',
+    border: '2px solid rgba(245, 158, 11, 0.3)',
+    borderRadius: '16px',
+    padding: '24px',
+    marginTop: '40px',
+    textAlign: 'left',
+  },
+  disclaimerTitle: {
+    fontSize: '1.3rem',
+    fontWeight: '600',
+    color: '#fbbf24',
+    marginBottom: '12px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  disclaimerText: {
+    fontSize: '1rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: '1.6',
+    marginBottom: '16px',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  emergencyContacts: {
+    background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.3)',
+    borderRadius: '12px',
+    padding: '16px',
+  },
+  emergencyTitle: {
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    color: '#fca5a5',
+    marginBottom: '8px',
+    fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
+  },
+  emergencyText: {
+    fontSize: '0.95rem',
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: '1.5',
+    margin: 0,
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
 };
 
