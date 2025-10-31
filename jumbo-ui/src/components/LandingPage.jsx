@@ -31,30 +31,101 @@ function LandingPage({ onGetStarted }) {
           .collaborate-options {
             grid-template-columns: 1fr !important;
           }
+          .landing-content {
+            padding: 20px 16px !important;
+          }
+          .landing-hero {
+            margin-bottom: 40px !important;
+          }
+          .landing-title {
+            font-size: 2.5rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 16px !important;
+          }
+          .landing-subtitle {
+            font-size: 1rem !important;
+            margin-bottom: 24px !important;
+            padding: 0 8px !important;
+          }
+          .landing-logo {
+            width: 80px !important;
+            height: 80px !important;
+            padding: 12px !important;
+          }
+          .landing-logo-container {
+            margin-bottom: 20px !important;
+          }
+          .landing-cta-button {
+            padding: 14px 24px !important;
+            font-size: 1rem !important;
+          }
+          .landing-features {
+            gap: 24px !important;
+            margin-bottom: 40px !important;
+          }
+          .landing-feature {
+            padding: 24px !important;
+          }
+          .landing-section {
+            margin-bottom: 40px !important;
+          }
+          .landing-tech-grid {
+            gap: 16px !important;
+          }
+          .landing-tech-category {
+            padding: 16px !important;
+          }
+          .landing-about-features {
+            gap: 16px !important;
+          }
+          .landing-about-feature {
+            padding: 16px !important;
+          }
+          .landing-contact-form {
+            padding: 0 8px !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .landing-title {
+            font-size: 2rem !important;
+          }
+          .landing-subtitle {
+            font-size: 0.9rem !important;
+          }
+          .landing-content {
+            padding: 16px 12px !important;
+          }
+          .landing-features {
+            gap: 16px !important;
+          }
+        }
         }
       `}</style>
-      <div style={styles.content}>
+      <div style={styles.content} className="landing-content">
         {/* Hero Section */}
-        <div style={styles.hero}>
-          <div style={styles.logoContainer}>
+        <div style={styles.hero} className="landing-hero">
+          <div style={styles.logoContainer} className="landing-logo-container">
             <img 
               src="/jumbo-logo.png" 
               alt="Jumbo Logo" 
               style={styles.logo}
+              className="landing-logo"
             />
           </div>
           
-          <h1 style={styles.title}>
+          <h1 style={styles.title} className="landing-title">
             Meet Jumbo
           </h1>
           
-          <p style={styles.subtitle}>
+          <p style={styles.subtitle} className="landing-subtitle">
             Your AI-powered emotional support companion with advanced conversation and memory capabilities
           </p>
           
           <button 
             onClick={onGetStarted}
             style={styles.ctaButton}
+            className="landing-cta-button"
             onMouseEnter={(e) => {
               e.target.style.transform = 'translateY(-2px)';
               e.target.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.4)';
@@ -70,8 +141,8 @@ function LandingPage({ onGetStarted }) {
         </div>
 
         {/* Features Section */}
-        <div style={styles.features}>
-          <div style={styles.feature}>
+        <div style={styles.features} className="landing-features">
+          <div style={styles.feature} className="landing-feature">
             <div style={styles.featureIcon}>
               <Heart size={24} color="#ef4444" />
             </div>
@@ -81,7 +152,7 @@ function LandingPage({ onGetStarted }) {
             </p>
           </div>
 
-          <div style={styles.feature}>
+          <div style={styles.feature} className="landing-feature">
             <div style={styles.featureIcon}>
               <Mic size={24} color="#8b5cf6" />
             </div>
@@ -91,7 +162,7 @@ function LandingPage({ onGetStarted }) {
             </p>
           </div>
 
-          <div style={styles.feature}>
+          <div style={styles.feature} className="landing-feature">
             <div style={styles.featureIcon}>
               <MessageCircle size={24} color="#06b6d4" />
             </div>
@@ -103,7 +174,7 @@ function LandingPage({ onGetStarted }) {
         </div>
 
         {/* About Section */}
-        <div style={styles.aboutSection}>
+        <div style={styles.aboutSection} className="landing-section">
           <h2 style={styles.sectionTitle}>About Jumbo</h2>
           <p style={styles.sectionDescription}>
             Jumbo is your caring emotional support companion powered by advanced AI technology. 
@@ -111,16 +182,16 @@ function LandingPage({ onGetStarted }) {
             understand, and provide meaningful support whenever you need it.
           </p>
           
-          <div style={styles.aboutFeatures}>
-            <div style={styles.aboutFeature}>
+          <div style={styles.aboutFeatures} className="landing-about-features">
+            <div style={styles.aboutFeature} className="landing-about-feature">
               <h4 style={styles.aboutFeatureTitle}>🔒 Privacy First</h4>
               <p style={styles.aboutFeatureText}>Your conversations are private and secure. We don't share your data with anyone.</p>
             </div>
-            <div style={styles.aboutFeature}>
+            <div style={styles.aboutFeature} className="landing-about-feature">
               <h4 style={styles.aboutFeatureTitle}>🧠 Smart Memory</h4>
               <p style={styles.aboutFeatureText}>Each conversation helps Jumbo understand you better and provide more personalized support.</p>
             </div>
-            <div style={styles.aboutFeature}>
+            <div style={styles.aboutFeature} className="landing-about-feature">
               <h4 style={styles.aboutFeatureTitle}>🌍 Always Available</h4>
               <p style={styles.aboutFeatureText}>24/7 emotional support whenever you need someone to talk to.</p>
             </div>
@@ -128,7 +199,7 @@ function LandingPage({ onGetStarted }) {
         </div>
 
         {/* MVP Disclaimer Section */}
-        <div style={styles.mvpSection}>
+        <div style={styles.mvpSection} className="landing-section">
           <div style={styles.mvpBanner}>
             <h3 style={styles.mvpTitle}>🚀 MVP Demo Version</h3>
             <p style={styles.mvpDescription}>
@@ -139,8 +210,8 @@ function LandingPage({ onGetStarted }) {
           
           <div style={styles.techStackSection}>
             <h4 style={styles.techStackTitle}>🛠️ Tech Stack & Architecture</h4>
-            <div style={styles.techGrid}>
-              <div style={styles.techCategory}>
+            <div style={styles.techGrid} className="landing-tech-grid">
+              <div style={styles.techCategory} className="landing-tech-category">
                 <h5 style={styles.techCategoryTitle}>Frontend</h5>
                 <ul style={styles.techList}>
                   <li style={styles.techListItem}>React.js with modern hooks</li>
@@ -150,7 +221,7 @@ function LandingPage({ onGetStarted }) {
                 </ul>
               </div>
               
-              <div style={styles.techCategory}>
+              <div style={styles.techCategory} className="landing-tech-category">
                 <h5 style={styles.techCategoryTitle}>Backend</h5>
                 <ul style={styles.techList}>
                   <li style={styles.techListItem}>Flask API with production architecture</li>
@@ -160,7 +231,7 @@ function LandingPage({ onGetStarted }) {
                 </ul>
               </div>
               
-              <div style={styles.techCategory}>
+              <div style={styles.techCategory} className="landing-tech-category">
                 <h5 style={styles.techCategoryTitle}>AI & Intelligence</h5>
                 <ul style={styles.techList}>
                   <li style={styles.techListItem}>Groq LLM integration (Llama 3)</li>
@@ -170,7 +241,7 @@ function LandingPage({ onGetStarted }) {
                 </ul>
               </div>
               
-              <div style={styles.techCategory}>
+              <div style={styles.techCategory} className="landing-tech-category">
                 <h5 style={styles.techCategoryTitle}>Infrastructure</h5>
                 <ul style={styles.techList}>
                   <li style={styles.techListItem}>Supabase (PostgreSQL + Auth)</li>
@@ -226,7 +297,7 @@ function LandingPage({ onGetStarted }) {
         </div>
 
         {/* Collaborate Section */}
-        <div style={styles.collaborateSection}>
+        <div style={styles.collaborateSection} className="landing-section">
           <h2 style={styles.sectionTitle}>Let's Collaborate</h2>
           <p style={styles.sectionDescription}>
             We're always looking to improve Jumbo and make it more helpful for everyone. 
@@ -256,7 +327,7 @@ function LandingPage({ onGetStarted }) {
               action="https://formspree.io/f/YOUR_FORM_ID" 
               method="POST"
               style={styles.contactForm}
-              className="contact-form"
+              className="contact-form landing-contact-form"
             >
               <div style={styles.formRow} className="form-row">
                 <input

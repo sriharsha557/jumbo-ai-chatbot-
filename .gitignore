@@ -157,3 +157,4 @@ test*.png
 # Test files (optional - remove if you want to include tests)
 test_*.py
 *_test.py
+.vercel

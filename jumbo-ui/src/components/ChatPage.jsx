@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Mic, MicOff, Sparkles, Send } from 'lucide-react';
+import { Mic, MicOff, Sparkles, Send, Volume2, VolumeX } from 'lucide-react';
 import { theme } from '../theme/theme';
 import GradientBackground from './GradientBackground';
 
@@ -23,6 +23,7 @@ function ChatPage({ currentUser }) {
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
   const [textInput, setTextInput] = useState('');
   const [conversationHistory, setConversationHistory] = useState([]);
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
 
   const recognitionRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis);
@@ -195,6 +196,11 @@ function ChatPage({ currentUser }) {
   }, [currentUser, handleSendMessage]);
 
   const speakResponse = (text) => {
+    if (!isSpeechEnabled) {
+      setScreenState('listening');
+      return;
+    }
+    
     setScreenState('responding');
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
@@ -325,11 +331,25 @@ function ChatPage({ currentUser }) {
           >
             {isMicActive ? <MicOff size={32} /> : <Mic size={32} />}
           </button>
+          
+          <button
+            onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
+            style={{
+              ...styles.speechToggleButton,
+              background: isSpeechEnabled
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+            }}
+            title={isSpeechEnabled ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+          >
+            {isSpeechEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          </button>
         </div>
 
         <p style={styles.micStatus}>
           {!isSpeechSupported ? 'Speech recognition not supported' :
-            isMicActive ? 'Click to stop' : 'Click to start'}
+            isMicActive ? 'Click to stop' : 'Click to start'} • 
+          Speech: {isSpeechEnabled ? 'ON' : 'OFF'}
         </p>
 
         <div style={styles.textInputSection}>
@@ -428,19 +448,21 @@ const styles = {
     border: '4px solid #22d3ee',
   },
   responseBox: {
-    background: 'rgba(255, 255, 255, 0.9)',
+    background: 'rgba(255, 255, 255, 0.95)',
     backdropFilter: 'blur(20px)',
     borderRadius: '24px',
     padding: '24px',
     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
-    border: '1px solid rgba(255, 255, 255, 0.3)',
+    border: '2px solid rgba(30, 64, 175, 0.2)',
     marginBottom: '32px',
   },
   responseText: {
-    color: '#374151',
+    color: '#1e40af', // Blue color for better visibility
     lineHeight: '1.625',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
     margin: 0,
+    fontSize: '16px',
+    fontWeight: '500',
   },
   moodLabel: {
     fontSize: '12px',
@@ -465,6 +487,8 @@ const styles = {
   micButtonSection: {
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center',
+    gap: '16px',
     marginBottom: '24px',
   },
   micButton: {
@@ -477,6 +501,19 @@ const styles = {
     justifyContent: 'center',
     color: 'white',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  },
+  speechToggleButton: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '50%',
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
   },
   micStatus: {
     textAlign: 'center',

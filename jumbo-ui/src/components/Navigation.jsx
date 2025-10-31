@@ -16,7 +16,29 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
   };
 
   return (
-    <nav style={styles.navbar}>
+    <>
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          .mobile-menu-toggle {
+            display: block !important;
+          }
+          .user-name {
+            display: none !important;
+          }
+          .user-section {
+            gap: 8px !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .mobile-menu-toggle {
+            display: none !important;
+          }
+        }
+      `}</style>
+      <nav style={styles.navbar}>
       <div style={styles.navContainer}>
         {/* Logo and Title */}
         <div style={styles.logo}>
@@ -27,7 +49,7 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
         </div>
 
         {/* Desktop Navigation */}
-        <div style={styles.desktopNav}>
+        <div style={styles.desktopNav} className="desktop-nav">
           {navItems.map(item => (
             <button
               key={item.id}
@@ -43,8 +65,8 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
         </div>
 
         {/* User Info and Logout */}
-        <div style={styles.userSection}>
-          <span style={styles.userName}>{userName}</span>
+        <div style={styles.userSection} className="user-section">
+          <span style={styles.userName} className="user-name">{userName}</span>
           <button
             onClick={onLogout}
             style={styles.logoutBtn}
@@ -57,6 +79,7 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
         {/* Mobile Menu Toggle */}
         <button
           style={styles.mobileMenuToggle}
+          className="mobile-menu-toggle"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -78,9 +101,28 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
               {item.label}
             </button>
           ))}
+          <button
+            onClick={() => {
+              onLogout();
+              setMobileMenuOpen(false);
+            }}
+            style={{
+              ...styles.mobileNavLink,
+              background: 'rgba(239, 68, 68, 0.2)',
+              color: '#fca5a5',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              justifyContent: 'center',
+            }}
+          >
+            <LogOut size={16} />
+            Logout
+          </button>
         </div>
       )}
     </nav>
+    </>
   );
 }
 
@@ -163,12 +205,18 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
+    '@media (max-width: 768px)': {
+      gap: '8px',
+    },
   },
   userName: {
     color: 'white',
     fontSize: '14px',
     fontWeight: '600',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+    '@media (max-width: 768px)': {
+      display: 'none', // Hide username on mobile to save space
+    },
   },
   logoutBtn: {
     background: 'rgba(255, 255, 255, 0.2)',

@@ -137,6 +137,25 @@ function ProfilePage({ currentUser }) {
 
   return (
     <GradientBackground variant="copilot" animated={true} style={styles.container}>
+      <style>{`
+        .checkbox-label:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+        }
+        .checkbox-group::-webkit-scrollbar {
+          width: 6px;
+        }
+        .checkbox-group::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+        }
+        .checkbox-group::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.5);
+          border-radius: 3px;
+        }
+        .checkbox-group::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.7);
+        }
+      `}</style>
       <div style={styles.content}>
         <div style={styles.profileCard}>
           {/* Header */}
@@ -367,12 +386,47 @@ function ProfilePage({ currentUser }) {
                 
                 <div style={styles.field}>
                   <label style={styles.label}>Focus Areas</label>
-                  <div style={styles.value}>
-                    {profileData.focus_areas && profileData.focus_areas.length > 0 ? 
-                      profileData.focus_areas.join(', ') : 
-                      'Not set'
-                    }
-                  </div>
+                  {isEditing ? (
+                    <div style={styles.checkboxGroup} className="checkbox-group">
+                      {[
+                        'Anxiety Management',
+                        'Depression Support', 
+                        'Stress Relief',
+                        'Sleep Issues',
+                        'Relationship Concerns',
+                        'Work-Life Balance',
+                        'Self-Esteem',
+                        'Grief & Loss',
+                        'Anger Management',
+                        'Social Anxiety',
+                        'General Mental Wellness'
+                      ].map(area => (
+                        <label key={area} style={styles.checkboxLabel} className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={editedData.focus_areas?.includes(area) || false}
+                            onChange={(e) => {
+                              const currentAreas = editedData.focus_areas || [];
+                              if (e.target.checked) {
+                                handleArrayChange('focus_areas', [...currentAreas, area]);
+                              } else {
+                                handleArrayChange('focus_areas', currentAreas.filter(a => a !== area));
+                              }
+                            }}
+                            style={styles.checkbox}
+                          />
+                          <span style={styles.checkboxText}>{area}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={styles.value}>
+                      {profileData.focus_areas && profileData.focus_areas.length > 0 ? 
+                        profileData.focus_areas.join(', ') : 
+                        'Not set'
+                      }
+                    </div>
+                  )}
                 </div>
                 
                 <div style={styles.field}>
@@ -394,6 +448,42 @@ function ProfilePage({ currentUser }) {
                         profileData.checkin_frequency.replace('_', ' ') : 
                         'Not set'
                       }
+                    </div>
+                  )}
+                </div>
+                
+                <div style={styles.field}>
+                  <label style={styles.label}>Preferred Check-in Time</label>
+                  {isEditing ? (
+                    <div style={styles.timeSelection}>
+                      <select
+                        value={editedData.checkin_time || ''}
+                        onChange={(e) => handleInputChange('checkin_time', e.target.value)}
+                        style={styles.select}
+                      >
+                        <option value="">Select time preference</option>
+                        <option value="morning">Morning (8:00 AM - 12:00 PM)</option>
+                        <option value="afternoon">Afternoon (12:00 PM - 5:00 PM)</option>
+                        <option value="evening">Evening (5:00 PM - 9:00 PM)</option>
+                        <option value="custom">Custom Time</option>
+                      </select>
+                      
+                      {editedData.checkin_time === 'custom' && (
+                        <input
+                          type="time"
+                          value={editedData.custom_checkin_time || ''}
+                          onChange={(e) => handleInputChange('custom_checkin_time', e.target.value)}
+                          style={{...styles.input, marginTop: '8px'}}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div style={styles.value}>
+                      {profileData.checkin_time ? (
+                        profileData.checkin_time === 'custom' ? 
+                          `Custom: ${profileData.custom_checkin_time || 'Not set'}` :
+                          profileData.checkin_time.charAt(0).toUpperCase() + profileData.checkin_time.slice(1)
+                      ) : 'Not set'}
                     </div>
                   )}
                 </div>
@@ -651,6 +741,41 @@ const styles = {
     fontSize: '14px',
     fontWeight: '500',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  checkboxGroup: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '8px',
+    maxHeight: '200px',
+    overflowY: 'auto',
+    padding: '8px',
+    border: '2px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '10px',
+    background: 'rgba(255, 255, 255, 0.05)',
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+    padding: '4px',
+    borderRadius: '6px',
+    transition: 'background 0.2s ease',
+  },
+  checkbox: {
+    width: '16px',
+    height: '16px',
+    accentColor: '#8b5cf6',
+  },
+  checkboxText: {
+    fontSize: '14px',
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  timeSelection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
   },
 };
 
