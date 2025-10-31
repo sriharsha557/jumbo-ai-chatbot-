@@ -102,7 +102,7 @@ def create_mood_blueprint(supabase_service, auth_service):
             # Save to database
             try:
                 # Insert into mood_entries table
-                result = supabase_service.client.table('mood_entries').insert(mood_entry).execute()
+                result = supabase_service.supabase.table('mood_entries').insert(mood_entry).execute()
                 
                 if result.data:
                     created_entry = result.data[0]
@@ -185,7 +185,7 @@ def create_mood_blueprint(supabase_service, auth_service):
             
             try:
                 # Query mood entries
-                result = supabase_service.client.table('mood_entries')\
+                result = supabase_service.supabase.table('mood_entries')\
                     .select('*')\
                     .eq('user_id', user['user_id'])\
                     .gte('timestamp', start_date.isoformat())\
@@ -280,7 +280,7 @@ def create_mood_blueprint(supabase_service, auth_service):
             
             try:
                 # Query latest mood entry
-                result = supabase_service.client.table('mood_entries')\
+                result = supabase_service.supabase.table('mood_entries')\
                     .select('*')\
                     .eq('user_id', user['user_id'])\
                     .order('timestamp', desc=True)\
@@ -352,7 +352,7 @@ def create_mood_blueprint(supabase_service, auth_service):
             
             try:
                 # Query mood entries for trend analysis
-                result = supabase_service.client.table('mood_entries')\
+                result = supabase_service.supabase.table('mood_entries')\
                     .select('mood_type, mood_numeric, timestamp')\
                     .eq('user_id', user['user_id'])\
                     .gte('timestamp', start_date.isoformat())\
@@ -493,7 +493,7 @@ def create_mood_blueprint(supabase_service, auth_service):
             
             try:
                 # Delete mood entry (only if it belongs to the user)
-                result = supabase_service.client.table('mood_entries')\
+                result = supabase_service.supabase.table('mood_entries')\
                     .delete()\
                     .eq('id', entry_id)\
                     .eq('user_id', user['user_id'])\

@@ -76,23 +76,25 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
         headers['Authorization'] = `Bearer ${currentUser.access_token}`;
       }
       
-      const response = await fetch(`${apiUrl}/onboarding/preferences`, {
+      const response = await fetch(`${apiUrl}/profile/me`, {
         method: 'GET',
         headers
       });
       
       if (response.ok) {
         const data = await response.json();
-        if (data.success && data.preferences) {
-          // Use display_name from onboarding, fallback to current name, then email
-          const displayName = data.preferences.display_name || 
+        if (data.success && data.profile) {
+          // Use preferred_name from profile, fallback to current name, then email
+          const displayName = data.profile.preferred_name || 
+                             data.profile.display_name ||
                              currentUser.name || 
                              currentUser.email?.split('@')[0] || 
                              'there';
           setPreferredName(displayName);
-          console.log('✅ User profile loaded:', { displayName });
+          console.log('✅ User profile loaded:', { displayName, profile: data.profile });
         } else {
           // Fallback to current user name
+          console.log('⚠️ No profile data found, using fallback name');
           setPreferredName(getDefaultName());
         }
       } else {
