@@ -2,7 +2,7 @@ import React from 'react';
 import { Sparkles, Heart, Mic, MessageCircle, Info, LogIn, Smartphone } from 'lucide-react';
 import { theme } from '../theme/theme';
 
-function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
+function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
   const [scrolled, setScrolled] = React.useState(false);
   const [videoLoaded, setVideoLoaded] = React.useState(false);
   const [videoError, setVideoError] = React.useState(false);
@@ -102,6 +102,28 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
           color: white;
         }
         
+        /* Force horizontal layout on desktop */
+        .explainer-steps {
+          display: flex !important;
+          flex-direction: row !important;
+          justify-content: center !important;
+          gap: 32px !important;
+          flex-wrap: nowrap !important;
+        }
+        
+        .explainer-step {
+          flex: 1 !important;
+          max-width: 350px !important;
+          min-width: 300px !important;
+        }
+        
+        @media (max-width: 1024px) {
+          .explainer-steps {
+            gap: 20px !important;
+            max-width: 900px !important;
+          }
+        }
+        
         @media (max-width: 768px) {
           .landing-content {
             padding: 120px 16px 20px !important;
@@ -119,12 +141,7 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
             max-width: 400px !important;
             margin: 0 auto 60px !important;
           }
-          .explainer-steps {
-            grid-template-columns: 1fr !important;
-            gap: 20px !important;
-            max-width: 400px !important;
-            margin: 0 auto 48px !important;
-          }
+
           .quick-features {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 12px !important;
@@ -180,21 +197,7 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
             flex-direction: column !important;
             align-items: center !important;
           }
-          .explainer-steps {
-            grid-template-columns: 1fr !important;
-            gap: 20px !important;
-          }
-          .explainer-step {
-            flex-direction: column !important;
-            text-align: center !important;
-            gap: 16px !important;
-          }
-          .explainer-title {
-            font-size: 2rem !important;
-          }
-          .explainer-subtitle {
-            font-size: 1rem !important;
-          }
+
         }
         
         @media (max-width: 480px) {
@@ -228,18 +231,7 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
             font-size: 12px !important;
             padding: 6px 12px !important;
           }
-          .explainer-title {
-            font-size: 1.8rem !important;
-          }
-          .explainer-steps {
-            max-width: 300px !important;
-          }
-          .explainer-step {
-            flex-direction: column !important;
-            text-align: center !important;
-            gap: 16px !important;
-            padding: 20px 16px !important;
-          }
+
           .step-number {
             width: 40px !important;
             height: 40px !important;
@@ -258,7 +250,7 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
         }
       `}</style>
       
-      {/* Header with Help and Login buttons */}
+      {/* Header with About | Logo (Home) | Login */}
       <div style={{
         ...styles.header,
         borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
@@ -266,6 +258,7 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
       }}>
+        {/* Left: About Button */}
         <button 
           onClick={onAbout}
           style={{
@@ -286,6 +279,27 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
           About
         </button>
         
+        {/* Center: Logo (Home Button) */}
+        <button 
+          onClick={onHome || (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}
+          style={styles.homeLogoButton}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <img 
+            src="/jumbo-logo.png" 
+            alt="Jumbo Home" 
+            style={styles.navLogo}
+          />
+        </button>
+        
+        {/* Right: Login Button */}
         <button 
           onClick={onLogin}
           style={{
@@ -310,15 +324,6 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
       <div style={styles.content} className="landing-content">
         {/* Hero Section */}
         <div style={styles.hero} className="landing-hero">
-          <div style={styles.logoContainer} className="landing-logo-container">
-            <img 
-              src="/jumbo-logo.png" 
-              alt="Jumbo Logo" 
-              style={styles.logo}
-              className="landing-logo"
-            />
-          </div>
-          
           <h1 style={styles.title} className="landing-title">
             Meet Jumbo
           </h1>
@@ -360,48 +365,33 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
           </div>
         </div>
 
-        {/* One-Screen Explainer */}
-        <div style={styles.explainerSection} className="landing-section">
-          <h2 style={styles.explainerTitle} className="explainer-title">How Jumbo Helps You Feel Better</h2>
-          <p style={styles.explainerSubtitle} className="explainer-subtitle">
+        {/* How Jumbo Works - Horizontal Steps */}
+        <div style={styles.howItWorksSection}>
+          <h2 style={styles.howItWorksTitle}>How Jumbo Helps You Feel Better</h2>
+          <p style={styles.howItWorksSubtitle}>
             Mental wellness shouldn't be complicated. Jumbo makes emotional support accessible, 
             private, and available whenever you need it most.
           </p>
           
-          <div style={styles.explainerSteps} className="explainer-steps">
-            <div style={styles.explainerStep} className="explainer-step">
-              <div style={styles.stepNumber} className="step-number">1</div>
-              <div style={styles.stepContent}>
-                <h3 style={styles.stepTitle}>Share Your Feelings</h3>
-                <p style={styles.stepDescription}>
-                  Talk to Jumbo about anything. No judgment, just caring support.
-                </p>
-              </div>
+          <div style={styles.stepsContainer} className="steps-container">
+            <div style={styles.step} className="step">
+              <div style={styles.stepIcon}>1</div>
+              <h3 style={styles.stepHeading}>Share Your Feelings</h3>
+              <p style={styles.stepText}>Talk to Jumbo about anything. No judgment, just caring support.</p>
             </div>
             
-            <div style={styles.explainerStep} className="explainer-step">
-              <div style={styles.stepNumber} className="step-number">2</div>
-              <div style={styles.stepContent}>
-                <h3 style={styles.stepTitle}>Get Personalized Support</h3>
-                <p style={styles.stepDescription}>
-                  Jumbo understands your emotions and provides tailored responses.
-                </p>
-              </div>
+            <div style={styles.step} className="step">
+              <div style={styles.stepIcon}>2</div>
+              <h3 style={styles.stepHeading}>Get Personalized Support</h3>
+              <p style={styles.stepText}>Jumbo understands your emotions and provides tailored responses.</p>
             </div>
             
-            <div style={styles.explainerStep} className="explainer-step">
-              <div style={styles.stepNumber} className="step-number">3</div>
-              <div style={styles.stepContent}>
-                <h3 style={styles.stepTitle}>Build Emotional Resilience</h3>
-                <p style={styles.stepDescription}>
-                  Jumbo learns about you and helps develop healthy coping strategies.
-                </p>
-              </div>
+            <div style={styles.step} className="step">
+              <div style={styles.stepIcon}>3</div>
+              <h3 style={styles.stepHeading}>Build Emotional Resilience</h3>
+              <p style={styles.stepText}>Jumbo learns about you and helps develop healthy coping strategies.</p>
             </div>
           </div>
-          
-
-
         </div>
 
         {/* Features Section */}
@@ -583,7 +573,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 24px',
+    padding: '12px 24px',
     transition: 'all 0.3s ease',
   },
   aboutButton: {
@@ -599,6 +589,26 @@ const styles = {
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  homeLogoButton: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    borderRadius: '50%',
+    padding: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+  },
+  navLogo: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '50%',
+    background: 'rgba(255, 255, 255, 0.9)',
+    padding: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   loginButton: {
     display: 'flex',
@@ -835,19 +845,20 @@ const styles = {
     border: '1px solid rgba(255, 255, 255, 0.2)',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
-  explainerSection: {
+  howItWorksSection: {
     marginBottom: '80px',
     textAlign: 'center',
-    maxWidth: '1000px',
+    maxWidth: '1200px',
+    margin: '0 auto 80px',
   },
-  explainerTitle: {
+  howItWorksTitle: {
     fontSize: '2.5rem',
     fontWeight: '600',
     color: 'white',
     marginBottom: '16px',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
   },
-  explainerSubtitle: {
+  howItWorksSubtitle: {
     fontSize: '1.2rem',
     color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: '48px',
@@ -856,29 +867,25 @@ const styles = {
     lineHeight: '1.6',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
-  explainerSteps: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '24px',
-    marginBottom: '48px',
-    maxWidth: '1000px',
-    margin: '0 auto 48px',
+  stepsContainer: {
+    display: 'table',
+    width: '100%',
+    tableLayout: 'fixed',
+    borderSpacing: '20px 0',
   },
-  explainerStep: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '20px',
-    textAlign: 'left',
+  step: {
+    display: 'table-cell',
+    verticalAlign: 'top',
+    textAlign: 'center',
     background: 'rgba(255, 255, 255, 0.05)',
-    padding: '24px',
+    padding: '24px 16px',
     borderRadius: '16px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    maxWidth: '350px',
-    margin: '0 auto',
+    width: '33.333%',
   },
-  stepNumber: {
-    width: '48px',
-    height: '48px',
+  stepIcon: {
+    width: '50px',
+    height: '50px',
     borderRadius: '50%',
     background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
     color: 'white',
@@ -887,21 +894,17 @@ const styles = {
     justifyContent: 'center',
     fontSize: '20px',
     fontWeight: '600',
-    flexShrink: 0,
+    margin: '0 auto 16px',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
   },
-  stepContent: {
-    flex: 1,
-    maxWidth: '250px',
-  },
-  stepTitle: {
-    fontSize: '1.3rem',
+  stepHeading: {
+    fontSize: '1.2rem',
     fontWeight: '600',
     color: 'white',
-    marginBottom: '8px',
+    marginBottom: '12px',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Bricolage Grotesque, sans-serif',
   },
-  stepDescription: {
+  stepText: {
     fontSize: '1rem',
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: '1.5',

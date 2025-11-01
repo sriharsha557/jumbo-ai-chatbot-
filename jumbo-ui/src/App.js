@@ -286,6 +286,10 @@ function App() {
     setCurrentPage('landing');
   };
 
+  const handleHome = () => {
+    setCurrentPage('landing');
+  };
+
   // Show loading state while checking for existing session or onboarding status
   if (isLoading || isCheckingOnboarding) {
     return (
@@ -325,12 +329,12 @@ function App() {
       return <AuthPage onUserLogin={handleUserLogin} />;
     }
     if (currentPage === 'about') {
-      return <AboutPage onBack={handleBackToLanding} onHelp={handleHelp} onLogin={handleLogin} />;
+      return <AboutPage onBack={handleBackToLanding} onHelp={handleHelp} onHome={handleHome} onLogin={handleLogin} />;
     }
     if (currentPage === 'help') {
       return <HelpPage onBack={handleBackToLanding} onLogin={handleLogin} />;
     }
-    return <LandingPage onGetStarted={handleGetStarted} onAbout={handleAbout} onHelp={handleHelp} onLogin={handleLogin} />;
+    return <LandingPage onGetStarted={handleGetStarted} onAbout={handleAbout} onHelp={handleHelp} onHome={handleHome} onLogin={handleLogin} />;
   }
 
   // If user needs onboarding, show onboarding flow

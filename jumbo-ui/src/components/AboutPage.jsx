@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowLeft, Heart, Users, Map, Shield, Smartphone } from 'lucide-react';
 import { theme } from '../theme/theme';
 
-function AboutPage({ onBack, onHelp, onLogin }) {
+function AboutPage({ onBack, onHelp, onHome, onLogin }) {
   const [videoLoaded, setVideoLoaded] = React.useState(false);
   const [videoError, setVideoError] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
@@ -74,7 +74,7 @@ function AboutPage({ onBack, onHelp, onLogin }) {
           ? 'linear-gradient(135deg, rgba(12, 20, 38, 0.8) 0%, rgba(30, 41, 59, 0.7) 50%, rgba(14, 165, 233, 0.6) 100%)'
           : 'linear-gradient(135deg, rgba(12, 20, 38, 0.4) 0%, rgba(30, 41, 59, 0.3) 50%, rgba(14, 165, 233, 0.2) 100%)'
       }}></div>
-      {/* Header */}
+      {/* Header with Back | Logo (Home) | Get Started */}
       <div style={{
         ...styles.header,
         borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
@@ -82,6 +82,7 @@ function AboutPage({ onBack, onHelp, onLogin }) {
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
       }}>
+        {/* Left: Back Button */}
         <button 
           onClick={onBack} 
           style={{
@@ -92,9 +93,30 @@ function AboutPage({ onBack, onHelp, onLogin }) {
           }}
         >
           <ArrowLeft size={20} style={{ marginRight: '8px' }} />
-          Back to Home
+          Back
         </button>
         
+        {/* Center: Logo (Home Button) */}
+        <button 
+          onClick={onHome || onBack}
+          style={styles.homeLogoButton}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <img 
+            src="/jumbo-logo.png" 
+            alt="Jumbo Home" 
+            style={styles.navLogo}
+          />
+        </button>
+        
+        {/* Right: Get Started Button */}
         <button 
           onClick={onLogin}
           style={styles.loginButton}
@@ -387,6 +409,26 @@ const styles = {
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  homeLogoButton: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    borderRadius: '50%',
+    padding: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+  },
+  navLogo: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '50%',
+    background: 'rgba(255, 255, 255, 0.9)',
+    padding: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   loginButton: {
     display: 'flex',
