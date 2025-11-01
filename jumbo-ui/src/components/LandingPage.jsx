@@ -1,11 +1,22 @@
 import React from 'react';
 import { Sparkles, Heart, Mic, MessageCircle, HelpCircle, LogIn, Smartphone } from 'lucide-react';
-import GradientBackground from './GradientBackground';
 import { theme } from '../theme/theme';
 
 function LandingPage({ onGetStarted, onHelp, onLogin }) {
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 100;
+      setScrolled(isScrolled);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <GradientBackground variant="copilot" animated={true} style={styles.container}>
+    <div style={styles.container}>
       <style>{`
         .contact-form input::placeholder,
         .contact-form textarea::placeholder {
@@ -136,16 +147,25 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
       `}</style>
       
       {/* Header with Help and Login buttons */}
-      <div style={styles.header}>
+      <div style={{
+        ...styles.header,
+        borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+        background: scrolled ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)',
+        backdropFilter: scrolled ? 'blur(20px)' : 'blur(10px)',
+      }}>
         <button 
           onClick={onHelp}
-          style={styles.helpButton}
+          style={{
+            ...styles.helpButton,
+            background: scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
+            border: scrolled ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.2)',
+          }}
           className="help-button"
           onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+            e.target.style.background = 'rgba(255, 255, 255, 0.25)';
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.target.style.background = scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)';
           }}
         >
           <HelpCircle size={20} style={{ marginRight: '8px' }} />
@@ -154,15 +174,18 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
         
         <button 
           onClick={onLogin}
-          style={styles.loginButton}
+          style={{
+            ...styles.loginButton,
+            boxShadow: scrolled ? '0 25px 50px -12px rgba(139, 92, 246, 0.4)' : '0 20px 25px -5px rgba(139, 92, 246, 0.3)',
+          }}
           className="login-button"
           onMouseEnter={(e) => {
             e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 25px 50px -12px rgba(139, 92, 246, 0.4)';
+            e.target.style.boxShadow = '0 25px 50px -12px rgba(139, 92, 246, 0.5)';
           }}
           onMouseLeave={(e) => {
             e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 20px 25px -5px rgba(139, 92, 246, 0.3)';
+            e.target.style.boxShadow = scrolled ? '0 25px 50px -12px rgba(139, 92, 246, 0.4)' : '0 20px 25px -5px rgba(139, 92, 246, 0.3)';
           }}
         >
           <LogIn size={18} style={{ marginRight: '8px' }} />
@@ -390,13 +413,15 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           </p>
         </div>
       </div>
-    </GradientBackground>
+    </div>
   );
 }
 
 const styles = {
   container: {
-    // GradientBackground handles centering now
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #0c1426 0%, #1e293b 50%, #0ea5e9 100%)',
+    position: 'relative',
   },
   header: {
     position: 'fixed',
@@ -408,9 +433,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '16px 24px',
-    background: 'rgba(0, 0, 0, 0.1)',
-    backdropFilter: 'blur(20px)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    transition: 'all 0.3s ease',
   },
   helpButton: {
     display: 'flex',
