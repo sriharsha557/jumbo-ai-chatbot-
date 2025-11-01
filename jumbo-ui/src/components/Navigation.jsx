@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LogOut, Menu, X } from 'lucide-react';
 import { theme } from '../theme/theme';
 
-function Navigation({ currentPage, onNavigate, userName, onLogout }) {
+function Navigation({ currentPage, onNavigate, userName, onLogout, scrolled = false }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -38,7 +38,10 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
           }
         }
       `}</style>
-      <nav style={styles.navbar}>
+      <nav style={{
+        ...styles.navbar,
+        ...(scrolled ? styles.navbarScrolled : styles.navbarTop)
+      }}>
       <div style={styles.navContainer}>
         {/* Logo and Title */}
         <div style={styles.logo}>
@@ -146,17 +149,28 @@ function Navigation({ currentPage, onNavigate, userName, onLogout }) {
 
 const styles = {
   navbar: {
-    background: 'rgba(15, 23, 42, 0.85)', // More opaque dark background
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)', // Safari support
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
     position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 1000,
+    transition: 'all 0.3s ease',
+  },
+  navbarTop: {
+    background: 'transparent',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
+    border: 'none',
+    borderBottom: 'none',
+    boxShadow: 'none',
+  },
+  navbarScrolled: {
+    background: 'rgba(15, 23, 42, 0.85)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
   },
   navContainer: {
     maxWidth: '1200px',

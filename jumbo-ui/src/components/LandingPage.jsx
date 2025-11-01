@@ -4,6 +4,8 @@ import { theme } from '../theme/theme';
 
 function LandingPage({ onGetStarted, onHelp, onLogin }) {
   const [scrolled, setScrolled] = React.useState(false);
+  const [videoLoaded, setVideoLoaded] = React.useState(false);
+  const [videoError, setVideoError] = React.useState(false);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -15,8 +17,73 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Attempt to play video manually if autoplay fails
+  React.useEffect(() => {
+    const video = document.querySelector('video');
+    if (video) {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Autoplay prevented:', error);
+          // Video will still be visible but not playing
+        });
+      }
+    }
+  }, [videoLoaded]);
+
   return (
     <div style={styles.container}>
+      {/* Background Video */}
+      {!videoError && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          style={{
+            ...styles.backgroundVideo,
+            opacity: videoLoaded ? 0.6 : 0.2,
+            transition: 'opacity 1s ease-in-out'
+          }}
+          onError={(e) => {
+            console.log('Video failed to load:', e);
+            setVideoError(true);
+          }}
+          onLoadedData={() => {
+            console.log('Video loaded successfully');
+            setVideoLoaded(true);
+          }}
+          onCanPlay={() => {
+            console.log('Video can play, videoLoaded state:', videoLoaded);
+            setVideoLoaded(true);
+          }}
+          onPlay={() => {
+            console.log('Video is playing');
+          }}
+        >
+          <source src="/Jumbo_Preview.mp4" type="video/mp4" />
+          <source src="/jumbo-demo.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      )}
+      
+      {/* Video Overlay for better text readability */}
+      <div style={{
+        ...styles.videoOverlay,
+        background: videoError || !videoLoaded 
+          ? 'linear-gradient(135deg, rgba(12, 20, 38, 0.8) 0%, rgba(30, 41, 59, 0.7) 50%, rgba(14, 165, 233, 0.6) 100%)'
+          : 'linear-gradient(135deg, rgba(12, 20, 38, 0.4) 0%, rgba(30, 41, 59, 0.3) 50%, rgba(14, 165, 233, 0.2) 100%)'
+      }}></div>
+      
+      {/* Loading indicator for video */}
+      {!videoLoaded && !videoError && (
+        <div style={styles.videoLoading}>
+          <div style={styles.loadingSpinner}></div>
+        </div>
+      )}
+      
+
       <style>{`
         .contact-form input::placeholder,
         .contact-form textarea::placeholder {
@@ -43,6 +110,26 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
             padding: 8px 16px !important;
             font-size: 0.9rem !important;
           }
+          .background-video {
+            opacity: 0.2 !important;
+          }
+          .landing-features {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            max-width: 400px !important;
+            margin: 0 auto 60px !important;
+          }
+          .explainer-steps {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            max-width: 400px !important;
+            margin: 0 auto 48px !important;
+          }
+          .quick-features {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+        }
           .landing-hero {
             margin-bottom: 40px !important;
           }
@@ -126,9 +213,16 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           }
           .landing-features {
             gap: 16px !important;
+            max-width: 300px !important;
+          }
+          .landing-feature {
+            padding: 24px 16px !important;
+            min-height: 180px !important;
           }
           .trust-badges {
             gap: 6px !important;
+            flex-direction: column !important;
+            align-items: center !important;
           }
           .trust-badge {
             font-size: 12px !important;
@@ -137,11 +231,29 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           .explainer-title {
             font-size: 1.8rem !important;
           }
+          .explainer-steps {
+            max-width: 300px !important;
+          }
+          .explainer-step {
+            flex-direction: column !important;
+            text-align: center !important;
+            gap: 16px !important;
+            padding: 20px 16px !important;
+          }
           .step-number {
             width: 40px !important;
             height: 40px !important;
             font-size: 18px !important;
           }
+          .quick-features {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
         }
       `}</style>
@@ -150,15 +262,17 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
       <div style={{
         ...styles.header,
         borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
-        background: scrolled ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)',
-        backdropFilter: scrolled ? 'blur(20px)' : 'blur(10px)',
+        background: scrolled ? 'rgba(0, 0, 0, 0.3)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
       }}>
         <button 
           onClick={onHelp}
           style={{
             ...styles.helpButton,
-            background: scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
-            border: scrolled ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.2)',
+            background: scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+            border: scrolled ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)',
+            backdropFilter: scrolled ? 'blur(10px)' : 'none',
           }}
           className="help-button"
           onMouseEnter={(e) => {
@@ -295,9 +409,9 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
                 style={styles.video}
                 poster="/jumbo-logo.png"
               >
-                <source src="/jumbo-demo.mp4" type="video/mp4" />
+                <source src="/Jumbo_Preview.mp4" type="video/mp4" />
                 Your browser doesn't support video playback. 
-                <a href="/jumbo-demo.mp4" style={{color: 'white'}}>Download the video</a>
+                <a href="/Jumbo_Preview.mp4" style={{color: 'white'}}>Download the video</a>
               </video>
               <p style={styles.videoDescription}>
                 Watch how Jumbo provides empathetic support and builds meaningful conversations
@@ -309,7 +423,18 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
 
         {/* Features Section */}
         <div style={styles.features} className="landing-features">
-          <div style={styles.feature} className="landing-feature">
+          <div 
+            style={styles.feature} 
+            className="landing-feature"
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-5px)';
+              e.target.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = 'none';
+            }}
+          >
             <div style={styles.featureIcon}>
               <Heart size={24} color="#ef4444" />
             </div>
@@ -319,7 +444,18 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
             </p>
           </div>
 
-          <div style={styles.feature} className="landing-feature">
+          <div 
+            style={styles.feature} 
+            className="landing-feature"
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-5px)';
+              e.target.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = 'none';
+            }}
+          >
             <div style={styles.featureIcon}>
               <Mic size={24} color="#8b5cf6" />
             </div>
@@ -329,7 +465,18 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
             </p>
           </div>
 
-          <div style={styles.feature} className="landing-feature">
+          <div 
+            style={styles.feature} 
+            className="landing-feature"
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-5px)';
+              e.target.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = 'none';
+            }}
+          >
             <div style={styles.featureIcon}>
               <MessageCircle size={24} color="#06b6d4" />
             </div>
@@ -348,7 +495,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
             safe, private, and effective mental wellness support whenever you need it.
           </p>
           
-          <div style={styles.quickFeatures}>
+          <div style={styles.quickFeatures} className="quick-features">
             <div style={styles.quickFeature}>🔒 100% Private & Secure</div>
             <div style={styles.quickFeature}>🧠 Evidence-Based Support</div>
             <div style={styles.quickFeature}>🌍 Available 24/7</div>
@@ -422,6 +569,27 @@ const styles = {
     minHeight: '100vh',
     background: 'linear-gradient(135deg, #0c1426 0%, #1e293b 50%, #0ea5e9 100%)',
     position: 'relative',
+    overflow: 'hidden',
+  },
+  backgroundVideo: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: 1,
+    pointerEvents: 'none',
+    transform: 'translateZ(0)', // Force hardware acceleration
+  },
+  videoOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(135deg, rgba(12, 20, 38, 0.7) 0%, rgba(30, 41, 59, 0.6) 50%, rgba(14, 165, 233, 0.5) 100%)',
+    zIndex: 2,
   },
   header: {
     position: 'fixed',
@@ -471,6 +639,8 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     textAlign: 'center',
+    position: 'relative',
+    zIndex: 10,
   },
   hero: {
     marginBottom: '80px',
@@ -536,10 +706,12 @@ const styles = {
   },
   features: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '40px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '24px',
     width: '100%',
+    maxWidth: '1000px',
     marginBottom: '60px',
+    justifyItems: 'center',
   },
   feature: {
     background: 'rgba(255, 255, 255, 0.1)',
@@ -548,6 +720,13 @@ const styles = {
     padding: '32px',
     border: '1px solid rgba(255, 255, 255, 0.2)',
     transition: 'all 0.3s ease',
+    width: '100%',
+    maxWidth: '320px',
+    minHeight: '200px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
   },
   featureIcon: {
     width: '60px',
@@ -588,9 +767,11 @@ const styles = {
   },
   quickFeatures: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
     gap: '16px',
     marginBottom: '32px',
+    maxWidth: '800px',
+    margin: '0 auto 32px',
   },
   quickFeature: {
     background: 'rgba(255, 255, 255, 0.1)',
@@ -694,9 +875,11 @@ const styles = {
   },
   explainerSteps: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '32px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '24px',
     marginBottom: '48px',
+    maxWidth: '1000px',
+    margin: '0 auto 48px',
   },
   explainerStep: {
     display: 'flex',
@@ -803,6 +986,21 @@ const styles = {
     lineHeight: '1.5',
     marginTop: '16px',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  videoLoading: {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: -1,
+  },
+  loadingSpinner: {
+    width: '40px',
+    height: '40px',
+    border: '3px solid rgba(255, 255, 255, 0.3)',
+    borderTop: '3px solid rgba(139, 92, 246, 0.8)',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
   },
 
 
