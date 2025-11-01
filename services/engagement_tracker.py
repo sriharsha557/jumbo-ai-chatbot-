@@ -1,0 +1,107 @@
+"""
+User Engagement Tracker for Enhanced Conversation System
+Tracks user engagement patterns and conversation quality improvements
+"""
+
+import time
+import json
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from collections import defaultdict, deque
+import logging
+import statistics
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class EngagementEvent:
+    """Single user engagement event"""
+    user_id: str
+    event_type: str  # 'message_sent', 'response_received', 'session_start', 'session_end'
+    timestamp: datetime
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class ConversationSession:
+    """User conversation session"""
+    user_id: str
+    session_id: str
+    start_time: datetime
+    end_time: Optional[datetime] = None
+    message_count: int = 0
+    total_response_time_ms: float = 0
+    avg_quality_score: float = 0
+    emotions_detected: List[str] = field(default_factory=list)
+    topics_discussed: List[str] = field(default_factory=list)
+    satisfaction_indicators: List[str] = field(default_factory=list)
+
+@dataclass
+class UserEngagementProfile:
+    """User engagement profile over time"""
+    user_id: str
+    first_interaction: datetime
+    last_interaction: datetime
+    total_sessions: int = 0
+    total_messages: int = 0
+    avg_session_duration_minutes: float = 0
+    avg_messages_per_session: float = 0
+    preferred_conversation_types: List[str] = field(default_factory=list)
+    engagement_trend: str = "stable"  # "increasing", "decreasing", "stable"
+    satisfaction_score: float = 0.5
+
+class EngagementAnalyzer:
+    """Analyzes user engagement patterns"""
+    
+    def __init__(self):
+        self.engagement_events = deque(maxlen=50000)  # Keep last 50k events
+        self.active_sessions = {}  # session_id -> ConversationSession
+        self.user_profiles = {}   # user_id -> UserEngagementProfile
+        self.session_counter = 0
+        
+        # Engagement scoring weights
+        self.scoring_weights = {
+            'message_frequency': 0.3,
+            'session_duration': 0.2,
+            'response_quality': 0.25,
+            'conversation_depth': 0.15,
+            'return_frequency': 0.1
+        }
+        
+        logger.info("Engagement analyzer initialized")
+    
+    def start_session(self, user_id: str) -> str:
+        """Start a new conversation session"""
+        self.session_counter += 1
+        session_id = f"session_{user_id}_{self.session_counter}_{int(time.time())}"
+        
+        session = ConversationSession(
+            user_id=user_id,
+            session_id=session_id,
+            start_time=datetime.utcnow()
+        )
+        
+        self.active_sessions[session_id] = session
+        
+        # Record engagement event
+        self._record_event(user_id, 'session_start', {'session_id': session_id})
+        
+        logger.debug(f"Started session {session_id} for user {user_id}")
+        return session_id
+    
+    def end_session(self, session_id: str):
+        """End a conversation session"""
+        if session_id in self.active_sessions:
+            session = self.active_sessions[session_id]
+            session.end_time = datetime.utcnow()
+            
+            # Calculate session metrics
+            duration = (session.end_time - session.start_time).total_seconds() / 60
+            session.avg_session_duration_minutes = duration
+            
+            if session.message_count > 0:
+                session.avg_quality_score = session.avg_quality_score / session.message_count
+            
+            # Record engagement event
+            self._record_event(session.user_id, 'session_end', {
+                'session_id': session_id,\n                'duration_minutes': duration,\n                'message_count': session.message_count\n            })\n            \n            # Update user profile\n            self._update_user_profile(session)\n            \n            # Remove from active sessions\n            del self.active_sessions[session_id]\n            \n            logger.debug(f\"Ended session {session_id}, duration: {duration:.1f} minutes\")\n    \n    def record_message(self, user_id: str, message: str, response_data: Dict[str, Any], \n                      session_id: str = None):\n        \"\"\"Record a message and response in the engagement system\"\"\"\n        # Find or create session\n        if not session_id:\n            # Find active session for user or create new one\n            user_sessions = [s for s in self.active_sessions.values() if s.user_id == user_id]\n            if user_sessions:\n                session = user_sessions[0]  # Use most recent session\n                session_id = session.session_id\n            else:\n                session_id = self.start_session(user_id)\n                session = self.active_sessions[session_id]\n        else:\n            session = self.active_sessions.get(session_id)\n        \n        if session:\n            # Update session metrics\n            session.message_count += 1\n            session.total_response_time_ms += response_data.get('processing_time_ms', 0)\n            session.avg_quality_score += response_data.get('quality_score', 0.5)\n            \n            # Track emotions and topics\n            emotion = response_data.get('emotion_detected', 'neutral')\n            if emotion not in session.emotions_detected:\n                session.emotions_detected.append(emotion)\n            \n            conversation_type = response_data.get('conversation_type', 'general')\n            if conversation_type not in session.topics_discussed:\n                session.topics_discussed.append(conversation_type)\n            \n            # Analyze satisfaction indicators\n            satisfaction_indicators = self._analyze_satisfaction(message, response_data)\n            session.satisfaction_indicators.extend(satisfaction_indicators)\n        \n        # Record engagement events\n        self._record_event(user_id, 'message_sent', {\n            'message_length': len(message),\n            'session_id': session_id\n        })\n        \n        self._record_event(user_id, 'response_received', {\n            'response_length': len(response_data.get('response', '')),\n            'quality_score': response_data.get('quality_score', 0.5),\n            'strategy_used': response_data.get('strategy_used', 'unknown'),\n            'session_id': session_id\n        })\n    \n    def _record_event(self, user_id: str, event_type: str, metadata: Dict[str, Any]):\n        \"\"\"Record an engagement event\"\"\"\n        event = EngagementEvent(\n            user_id=user_id,\n            event_type=event_type,\n            timestamp=datetime.utcnow(),\n            metadata=metadata\n        )\n        \n        self.engagement_events.append(event)\n    \n    def _analyze_satisfaction(self, message: str, response_data: Dict[str, Any]) -> List[str]:\n        \"\"\"Analyze message and response for satisfaction indicators\"\"\"\n        indicators = []\n        \n        message_lower = message.lower()\n        \n        # Positive indicators\n        positive_phrases = [\n            'thank you', 'thanks', 'helpful', 'great', 'awesome', 'perfect',\n            'exactly', 'that helps', 'i understand', 'makes sense'\n        ]\n        \n        if any(phrase in message_lower for phrase in positive_phrases):\n            indicators.append('positive_feedback')\n        \n        # Negative indicators\n        negative_phrases = [\n            'not helpful', 'wrong', 'doesn\\'t help', 'confused', 'frustrated',\n            'not what i meant', 'try again'\n        ]\n        \n        if any(phrase in message_lower for phrase in negative_phrases):\n            indicators.append('negative_feedback')\n        \n        # Engagement indicators\n        if len(message) > 50:  # Longer messages indicate engagement\n            indicators.append('detailed_message')\n        \n        if '?' in message:  # Questions indicate engagement\n            indicators.append('asking_questions')\n        \n        # Response quality indicators\n        quality_score = response_data.get('quality_score', 0.5)\n        if quality_score > 0.8:\n            indicators.append('high_quality_response')\n        elif quality_score < 0.4:\n            indicators.append('low_quality_response')\n        \n        return indicators\n    \n    def _update_user_profile(self, session: ConversationSession):\n        \"\"\"Update user engagement profile based on session\"\"\"\n        user_id = session.user_id\n        \n        if user_id not in self.user_profiles:\n            self.user_profiles[user_id] = UserEngagementProfile(\n                user_id=user_id,\n                first_interaction=session.start_time,\n                last_interaction=session.end_time or session.start_time\n            )\n        \n        profile = self.user_profiles[user_id]\n        \n        # Update basic metrics\n        profile.last_interaction = session.end_time or session.start_time\n        profile.total_sessions += 1\n        profile.total_messages += session.message_count\n        \n        # Calculate averages\n        if session.end_time:\n            duration = (session.end_time - session.start_time).total_seconds() / 60\n            profile.avg_session_duration_minutes = (\n                (profile.avg_session_duration_minutes * (profile.total_sessions - 1) + duration) /\n                profile.total_sessions\n            )\n        \n        profile.avg_messages_per_session = profile.total_messages / profile.total_sessions\n        \n        # Update preferred conversation types\n        for topic in session.topics_discussed:\n            if topic not in profile.preferred_conversation_types:\n                profile.preferred_conversation_types.append(topic)\n        \n        # Calculate satisfaction score\n        profile.satisfaction_score = self._calculate_user_satisfaction(user_id)\n        \n        # Determine engagement trend\n        profile.engagement_trend = self._calculate_engagement_trend(user_id)\n    \n    def _calculate_user_satisfaction(self, user_id: str) -> float:\n        \"\"\"Calculate user satisfaction score\"\"\"\n        # Get recent events for user\n        recent_events = [\n            event for event in self.engagement_events\n            if (event.user_id == user_id and \n                datetime.utcnow() - event.timestamp < timedelta(days=7))\n        ]\n        \n        if not recent_events:\n            return 0.5  # Default neutral score\n        \n        satisfaction_score = 0.5  # Start with neutral\n        \n        # Analyze satisfaction indicators\n        positive_indicators = 0\n        negative_indicators = 0\n        quality_scores = []\n        \n        for event in recent_events:\n            if event.event_type == 'response_received':\n                quality_score = event.metadata.get('quality_score', 0.5)\n                quality_scores.append(quality_score)\n        \n        # Get satisfaction indicators from sessions\n        user_sessions = [s for s in self.active_sessions.values() if s.user_id == user_id]\n        for session in user_sessions:\n            for indicator in session.satisfaction_indicators:\n                if 'positive' in indicator or 'high_quality' in indicator:\n                    positive_indicators += 1\n                elif 'negative' in indicator or 'low_quality' in indicator:\n                    negative_indicators += 1\n        \n        # Calculate weighted satisfaction\n        if quality_scores:\n            avg_quality = statistics.mean(quality_scores)\n            satisfaction_score = avg_quality * 0.6  # 60% weight on quality\n        \n        # Adjust based on feedback indicators\n        if positive_indicators + negative_indicators > 0:\n            feedback_ratio = positive_indicators / (positive_indicators + negative_indicators)\n            satisfaction_score = satisfaction_score * 0.7 + feedback_ratio * 0.3\n        \n        return min(1.0, max(0.0, satisfaction_score))\n    \n    def _calculate_engagement_trend(self, user_id: str) -> str:\n        \"\"\"Calculate user engagement trend\"\"\"\n        # Get user events from last 30 days\n        cutoff_date = datetime.utcnow() - timedelta(days=30)\n        user_events = [\n            event for event in self.engagement_events\n            if event.user_id == user_id and event.timestamp > cutoff_date\n        ]\n        \n        if len(user_events) < 10:  # Not enough data\n            return \"stable\"\n        \n        # Group events by week\n        weekly_activity = defaultdict(int)\n        for event in user_events:\n            week = event.timestamp.isocalendar()[1]  # Week number\n            weekly_activity[week] += 1\n        \n        if len(weekly_activity) < 2:\n            return \"stable\"\n        \n        # Calculate trend\n        weeks = sorted(weekly_activity.keys())\n        activities = [weekly_activity[week] for week in weeks]\n        \n        # Simple linear trend calculation\n        if len(activities) >= 3:\n            recent_avg = statistics.mean(activities[-2:])\n            earlier_avg = statistics.mean(activities[:-2])\n            \n            if recent_avg > earlier_avg * 1.2:\n                return \"increasing\"\n            elif recent_avg < earlier_avg * 0.8:\n                return \"decreasing\"\n        \n        return \"stable\"\n    \n    def get_user_engagement_summary(self, user_id: str) -> Dict[str, Any]:\n        \"\"\"Get engagement summary for a specific user\"\"\"\n        if user_id not in self.user_profiles:\n            return {'user_id': user_id, 'status': 'no_data'}\n        \n        profile = self.user_profiles[user_id]\n        \n        # Get recent activity\n        recent_events = [\n            event for event in self.engagement_events\n            if (event.user_id == user_id and \n                datetime.utcnow() - event.timestamp < timedelta(days=7))\n        ]\n        \n        # Calculate engagement score\n        engagement_score = self._calculate_engagement_score(user_id)\n        \n        return {\n            'user_id': user_id,\n            'engagement_score': engagement_score,\n            'satisfaction_score': profile.satisfaction_score,\n            'total_sessions': profile.total_sessions,\n            'total_messages': profile.total_messages,\n            'avg_session_duration_minutes': profile.avg_session_duration_minutes,\n            'avg_messages_per_session': profile.avg_messages_per_session,\n            'engagement_trend': profile.engagement_trend,\n            'preferred_topics': profile.preferred_conversation_types[:5],  # Top 5\n            'recent_activity_events': len(recent_events),\n            'days_since_first_interaction': (datetime.utcnow() - profile.first_interaction).days,\n            'days_since_last_interaction': (datetime.utcnow() - profile.last_interaction).days\n        }\n    \n    def _calculate_engagement_score(self, user_id: str) -> float:\n        \"\"\"Calculate overall engagement score for user\"\"\"\n        if user_id not in self.user_profiles:\n            return 0.0\n        \n        profile = self.user_profiles[user_id]\n        \n        # Component scores (0-1)\n        scores = {}\n        \n        # Message frequency score\n        days_active = (profile.last_interaction - profile.first_interaction).days + 1\n        messages_per_day = profile.total_messages / days_active\n        scores['message_frequency'] = min(1.0, messages_per_day / 5)  # Normalize to 5 messages/day\n        \n        # Session duration score\n        scores['session_duration'] = min(1.0, profile.avg_session_duration_minutes / 15)  # Normalize to 15 min\n        \n        # Response quality score (from satisfaction)\n        scores['response_quality'] = profile.satisfaction_score\n        \n        # Conversation depth score\n        scores['conversation_depth'] = min(1.0, profile.avg_messages_per_session / 10)  # Normalize to 10 messages\n        \n        # Return frequency score\n        if profile.total_sessions > 1:\n            avg_days_between_sessions = days_active / profile.total_sessions\n            scores['return_frequency'] = max(0.0, 1.0 - (avg_days_between_sessions / 7))  # Weekly return is ideal\n        else:\n            scores['return_frequency'] = 0.5  # Neutral for single session\n        \n        # Calculate weighted score\n        engagement_score = sum(\n            scores[component] * self.scoring_weights[component]\n            for component in scores\n        )\n        \n        return min(1.0, max(0.0, engagement_score))\n    \n    def get_engagement_analytics(self) -> Dict[str, Any]:\n        \"\"\"Get overall engagement analytics\"\"\"\n        total_users = len(self.user_profiles)\n        \n        if total_users == 0:\n            return {'total_users': 0, 'status': 'no_data'}\n        \n        # Calculate aggregate metrics\n        engagement_scores = []\n        satisfaction_scores = []\n        session_counts = []\n        message_counts = []\n        \n        for profile in self.user_profiles.values():\n            engagement_scores.append(self._calculate_engagement_score(profile.user_id))\n            satisfaction_scores.append(profile.satisfaction_score)\n            session_counts.append(profile.total_sessions)\n            message_counts.append(profile.total_messages)\n        \n        # Engagement distribution\n        high_engagement = sum(1 for score in engagement_scores if score > 0.7)\n        medium_engagement = sum(1 for score in engagement_scores if 0.4 <= score <= 0.7)\n        low_engagement = sum(1 for score in engagement_scores if score < 0.4)\n        \n        # Recent activity (last 7 days)\n        recent_cutoff = datetime.utcnow() - timedelta(days=7)\n        recent_active_users = sum(\n            1 for profile in self.user_profiles.values()\n            if profile.last_interaction > recent_cutoff\n        )\n        \n        return {\n            'total_users': total_users,\n            'avg_engagement_score': statistics.mean(engagement_scores),\n            'avg_satisfaction_score': statistics.mean(satisfaction_scores),\n            'engagement_distribution': {\n                'high': high_engagement,\n                'medium': medium_engagement,\n                'low': low_engagement\n            },\n            'avg_sessions_per_user': statistics.mean(session_counts),\n            'avg_messages_per_user': statistics.mean(message_counts),\n            'recent_active_users': recent_active_users,\n            'user_retention_rate': recent_active_users / total_users,\n            'total_events_tracked': len(self.engagement_events),\n            'active_sessions': len(self.active_sessions)\n        }\n    \n    def get_conversation_quality_trends(self) -> Dict[str, Any]:\n        \"\"\"Get conversation quality trends over time\"\"\"\n        # Group events by day\n        daily_quality = defaultdict(list)\n        \n        for event in self.engagement_events:\n            if event.event_type == 'response_received':\n                day = event.timestamp.date()\n                quality_score = event.metadata.get('quality_score', 0.5)\n                daily_quality[day].append(quality_score)\n        \n        # Calculate daily averages\n        quality_trends = {}\n        for day, scores in daily_quality.items():\n            if scores:\n                quality_trends[day.isoformat()] = {\n                    'avg_quality': statistics.mean(scores),\n                    'response_count': len(scores)\n                }\n        \n        # Calculate overall trend\n        if len(quality_trends) >= 7:  # Need at least a week of data\n            recent_days = sorted(quality_trends.keys())[-7:]\n            earlier_days = sorted(quality_trends.keys())[:-7][-7:] if len(quality_trends) >= 14 else []\n            \n            recent_avg = statistics.mean([\n                quality_trends[day]['avg_quality'] for day in recent_days\n            ])\n            \n            trend = \"stable\"\n            if earlier_days:\n                earlier_avg = statistics.mean([\n                    quality_trends[day]['avg_quality'] for day in earlier_days\n                ])\n                \n                if recent_avg > earlier_avg * 1.05:\n                    trend = \"improving\"\n                elif recent_avg < earlier_avg * 0.95:\n                    trend = \"declining\"\n        else:\n            trend = \"insufficient_data\"\n            recent_avg = 0.5\n        \n        return {\n            'daily_quality_scores': quality_trends,\n            'overall_trend': trend,\n            'recent_avg_quality': recent_avg,\n            'days_tracked': len(quality_trends)\n        }\n\n# Global engagement tracker instance\n_engagement_tracker = None\n\ndef get_engagement_tracker() -> EngagementAnalyzer:\n    \"\"\"Get global engagement tracker instance\"\"\"\n    global _engagement_tracker\n    if _engagement_tracker is None:\n        _engagement_tracker = EngagementAnalyzer()\n    return _engagement_tracker\n

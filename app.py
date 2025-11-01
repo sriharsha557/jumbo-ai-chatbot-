@@ -26,6 +26,7 @@ from monitoring import (
 from supabase_service import SupabaseService
 from services.auth_service import AuthService
 from services.chat_service import ChatService
+# from services.enhanced_chat_service import create_enhanced_chat_service
 
 # Import memory reliability system
 from database.memory_manager import MemoryManager
@@ -35,6 +36,7 @@ from database.migrations.migration_manager import MigrationManager
 # Import API blueprints
 from api.v1.auth import create_auth_blueprint
 from api.v1.chat import create_chat_blueprint
+# from api.v1.enhanced_chat import create_enhanced_chat_blueprint, create_hybrid_chat_blueprint
 from api.v1.profile import create_profile_blueprint
 from api.v1.memories import create_memories_blueprint
 from api.v1.onboarding import create_onboarding_blueprint
@@ -86,6 +88,7 @@ def create_app() -> Flask:
     supabase_service = None
     auth_service = None
     chat_service = None
+    enhanced_chat_service = None
     memory_manager = None
     backup_manager = None
     migration_manager = None
@@ -96,6 +99,12 @@ def create_app() -> Flask:
         auth_service = AuthService(supabase_service)
         chat_service = ChatService(supabase_service)
         
+        # Initialize enhanced chat service (temporarily disabled)
+        # from llm_service import LLMService
+        # llm_service = LLMService()
+        # enhanced_chat_service = create_enhanced_chat_service(supabase_service, llm_service)
+        enhanced_chat_service = None
+        
         # Initialize memory reliability system
         memory_manager = MemoryManager(supabase_service)
         backup_manager = BackupManager(supabase_service)
@@ -105,6 +114,7 @@ def create_app() -> Flask:
                    environment=config.environment.value,
                    debug=config.debug,
                    memory_system_enabled=True,
+                   enhanced_chat_enabled=False,
                    cors_origins=config.cors_origins)
         
     except Exception as e:
@@ -169,6 +179,18 @@ def create_app() -> Flask:
         create_chat_blueprint(chat_service, auth_service),
         url_prefix=f'{api_prefix}/chat'
     )
+    
+    # Enhanced chat endpoints (temporarily disabled)
+    # app.register_blueprint(
+    #     create_enhanced_chat_blueprint(enhanced_chat_service, auth_service),
+    #     url_prefix=f'{api_prefix}/enhanced-chat'
+    # )
+    
+    # Hybrid chat endpoints (temporarily disabled)
+    # app.register_blueprint(
+    #     create_hybrid_chat_blueprint(chat_service, enhanced_chat_service, auth_service),
+    #     url_prefix=f'{api_prefix}/hybrid-chat'
+    # )
     
     app.register_blueprint(
         create_profile_blueprint(chat_service, auth_service),

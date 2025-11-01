@@ -3,6 +3,7 @@ import Navigation from './components/Navigation';
 import ChatPage from './components/ChatPage';
 import AuthPage from './components/AuthPageSupabase';
 import LandingPage from './components/LandingPage';
+import HelpPage from './components/HelpPage';
 import OnboardingFlow from './components/OnboardingFlow';
 import WelcomePage from './components/WelcomePage';
 import ProfilePage from './components/ProfilePage';
@@ -268,6 +269,18 @@ function App() {
     setCurrentPage('auth');
   };
 
+  const handleHelp = () => {
+    setCurrentPage('help');
+  };
+
+  const handleLogin = () => {
+    setCurrentPage('auth');
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentPage('landing');
+  };
+
   // Show loading state while checking for existing session or onboarding status
   if (isLoading || isCheckingOnboarding) {
     return (
@@ -301,12 +314,15 @@ function App() {
     );
   }
 
-  // If no user, show landing or auth page
+  // If no user, show landing, help, or auth page
   if (!currentUser) {
     if (currentPage === 'auth') {
       return <AuthPage onUserLogin={handleUserLogin} />;
     }
-    return <LandingPage onGetStarted={handleGetStarted} />;
+    if (currentPage === 'help') {
+      return <HelpPage onBack={handleBackToLanding} onLogin={handleLogin} />;
+    }
+    return <LandingPage onGetStarted={handleGetStarted} onHelp={handleHelp} onLogin={handleLogin} />;
   }
 
   // If user needs onboarding, show onboarding flow

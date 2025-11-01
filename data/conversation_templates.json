@@ -1,0 +1,252 @@
+{
+  "templates": [
+    {
+      "id": "happy_celebration_1",
+      "category": "happy",
+      "emotion_tags": ["happy", "excited", "joyful"],
+      "conversation_type": "celebration",
+      "base_template": "That's wonderful {user_name}! I'm so happy for you! 🎉",
+      "variations": [
+        "That's amazing {user_name}! Your happiness makes me smile! 😊",
+        "How exciting {user_name}! I love hearing good news like this! ✨",
+        "That's fantastic {user_name}! You deserve all this joy! 🌟",
+        "Wonderful news {user_name}! I'm celebrating with you! 🎊"
+      ],
+      "follow_up_questions": [
+        "Tell me more about what happened!",
+        "How are you planning to celebrate?",
+        "What made this moment so special?",
+        "Who else knows about this exciting news?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "encouraging",
+      "usage_weight": 1.0,
+      "min_confidence": 0.6
+    },
+    {
+      "id": "sad_support_1",
+      "category": "sad",
+      "emotion_tags": ["sad", "down", "depressed", "upset"],
+      "conversation_type": "emotional_support",
+      "base_template": "I'm sorry you're going through this {user_name}. I'm here to listen. 💙",
+      "variations": [
+        "I can hear the sadness in your words {user_name}. You don't have to face this alone.",
+        "That sounds really difficult {user_name}. Thank you for sharing this with me.",
+        "I'm here with you {user_name}. Sometimes it helps just to talk about it.",
+        "Your feelings are completely valid {user_name}. I'm listening with my whole heart."
+      ],
+      "follow_up_questions": [
+        "Would you like to tell me more about what's bothering you?",
+        "How long have you been feeling this way?",
+        "Is there anything specific that triggered these feelings?",
+        "What usually helps you when you're feeling down?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "empathetic",
+      "usage_weight": 1.2,
+      "min_confidence": 0.5
+    },
+    {
+      "id": "anxious_calming_1",
+      "category": "anxious",
+      "emotion_tags": ["anxious", "worried", "nervous", "stressed"],
+      "conversation_type": "emotional_support",
+      "base_template": "I can sense your anxiety {user_name}. Let's take this one step at a time. 🌸",
+      "variations": [
+        "Take a deep breath with me {user_name}. You're safe here, and we'll work through this together.",
+        "I understand you're feeling overwhelmed {user_name}. Let's slow down and focus on what we can control.",
+        "Anxiety can feel so intense {user_name}. Remember, you've gotten through difficult times before.",
+        "Your worries are real {user_name}, but you don't have to carry them alone."
+      ],
+      "follow_up_questions": [
+        "What's the main thing that's worrying you right now?",
+        "Have you tried any breathing exercises or grounding techniques?",
+        "What would help you feel a little more calm right now?",
+        "Is this a familiar feeling, or is this anxiety new for you?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "calming",
+      "usage_weight": 1.1,
+      "min_confidence": 0.6
+    },
+    {
+      "id": "angry_validation_1",
+      "category": "angry",
+      "emotion_tags": ["angry", "mad", "furious", "irritated"],
+      "conversation_type": "emotional_support",
+      "base_template": "I can feel your anger {user_name}. Your feelings are completely valid. 🔥",
+      "variations": [
+        "That sounds incredibly frustrating {user_name}. It makes sense that you'd feel angry about this.",
+        "Your anger is telling us something important {user_name}. I'm here to listen and understand.",
+        "I hear how upset you are {user_name}. Sometimes anger is our way of protecting ourselves.",
+        "It's okay to feel angry {user_name}. Let's talk through what's making you feel this way."
+      ],
+      "follow_up_questions": [
+        "What happened that made you feel this angry?",
+        "How long have you been holding onto these feelings?",
+        "What would you need to feel better about this situation?",
+        "Have you been able to express your anger in a healthy way?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "validating",
+      "usage_weight": 1.0,
+      "min_confidence": 0.7
+    },
+    {
+      "id": "greeting_warm_1",
+      "category": "greeting",
+      "emotion_tags": ["neutral", "happy"],
+      "conversation_type": "greeting",
+      "base_template": "Hello {user_name}! It's wonderful to see you again! 🐘",
+      "variations": [
+        "Hi there {user_name}! How has your day been treating you?",
+        "Welcome back {user_name}! I've been thinking about our last conversation.",
+        "Hey {user_name}! I'm so glad you're here. What's on your mind today?",
+        "Hello my friend {user_name}! Ready for another heart-to-heart chat?"
+      ],
+      "follow_up_questions": [
+        "How are you feeling today?",
+        "What's been on your mind lately?",
+        "How has your week been going?",
+        "Is there anything special you'd like to talk about?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "gentle",
+      "usage_weight": 1.0,
+      "min_confidence": 0.3
+    },
+    {
+      "id": "memory_recall_friends_1",
+      "category": "memory",
+      "emotion_tags": ["neutral", "curious"],
+      "conversation_type": "memory_recall",
+      "base_template": "I remember you mentioned {friend_name} before! How are they doing?",
+      "variations": [
+        "Oh, {friend_name}! I recall you telling me about them. What's new with {friend_name}?",
+        "Speaking of {friend_name}, how have things been going with them lately?",
+        "I was just thinking about when you told me about {friend_name}. How are they?",
+        "You know, I remember our conversation about {friend_name}. Any updates?"
+      ],
+      "follow_up_questions": [
+        "Have you two been spending time together recently?",
+        "What do you and {friend_name} like to do together?",
+        "How long have you known {friend_name}?",
+        "What makes your friendship with {friend_name} special?"
+      ],
+      "context_requirements": ["user_name", "friend_name"],
+      "personality_tone": "curious",
+      "usage_weight": 1.3,
+      "min_confidence": 0.4
+    },
+    {
+      "id": "confused_clarification_1",
+      "category": "confused",
+      "emotion_tags": ["confused", "uncertain", "lost"],
+      "conversation_type": "advice_seeking",
+      "base_template": "I can sense you're feeling confused {user_name}. Let's work through this together step by step. 🤔",
+      "variations": [
+        "Confusion is completely normal {user_name}. Sometimes the best way forward is to talk it out.",
+        "I hear the uncertainty in your words {user_name}. Let's break this down into smaller pieces.",
+        "It's okay not to have all the answers {user_name}. We can explore this together.",
+        "When things feel confusing {user_name}, it often helps to start with what we do know."
+      ],
+      "follow_up_questions": [
+        "What's the main thing that's confusing you?",
+        "When did you first start feeling uncertain about this?",
+        "What information do you wish you had to make this clearer?",
+        "Have you talked to anyone else about this confusion?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "supportive",
+      "usage_weight": 1.0,
+      "min_confidence": 0.5
+    },
+    {
+      "id": "tired_rest_1",
+      "category": "tired",
+      "emotion_tags": ["tired", "exhausted", "drained", "weary"],
+      "conversation_type": "emotional_support",
+      "base_template": "You sound really tired {user_name}. It's important to listen to what your body and mind are telling you. 😴",
+      "variations": [
+        "I can hear the exhaustion in your words {user_name}. You deserve rest and care.",
+        "Being tired is your body's way of asking for what it needs {user_name}. That's wisdom.",
+        "Exhaustion is real {user_name}, and it's okay to acknowledge when you need to slow down.",
+        "You've been carrying a lot {user_name}. It makes perfect sense that you'd feel drained."
+      ],
+      "follow_up_questions": [
+        "What's been draining your energy lately?",
+        "When was the last time you had some real rest?",
+        "What helps you recharge when you're feeling this way?",
+        "Is this physical tiredness, emotional exhaustion, or both?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "gentle",
+      "usage_weight": 1.0,
+      "min_confidence": 0.6
+    },
+    {
+      "id": "frustrated_understanding_1",
+      "category": "frustrated",
+      "emotion_tags": ["frustrated", "annoyed", "fed up"],
+      "conversation_type": "emotional_support",
+      "base_template": "I can really feel your frustration {user_name}. Sometimes things just don't go the way we hope. 😤",
+      "variations": [
+        "That level of frustration sounds overwhelming {user_name}. You're not alone in feeling this way.",
+        "I hear how fed up you are {user_name}. Frustration often means we care deeply about something.",
+        "Your frustration makes complete sense {user_name}. Some situations are genuinely maddening.",
+        "I can sense how much this is bothering you {user_name}. Frustration can be so draining."
+      ],
+      "follow_up_questions": [
+        "What's the most frustrating part of this situation?",
+        "How long have you been dealing with this frustration?",
+        "What would need to change for you to feel less frustrated?",
+        "Have you found any ways to cope with this frustration?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "validating",
+      "usage_weight": 1.0,
+      "min_confidence": 0.6
+    },
+    {
+      "id": "casual_chat_1",
+      "category": "neutral",
+      "emotion_tags": ["neutral", "calm"],
+      "conversation_type": "casual_chat",
+      "base_template": "I'm enjoying our conversation {user_name}. What else is on your mind? 💭",
+      "variations": [
+        "It's nice just chatting with you {user_name}. What would you like to explore together?",
+        "I love these moments of connection {user_name}. What's been interesting in your world lately?",
+        "There's something peaceful about our conversations {user_name}. What shall we talk about?",
+        "I'm here and present with you {user_name}. What's flowing through your thoughts today?"
+      ],
+      "follow_up_questions": [
+        "What's been the highlight of your day so far?",
+        "Is there anything you've been curious about lately?",
+        "What's something that made you smile recently?",
+        "How do you like to spend your free time?"
+      ],
+      "context_requirements": ["user_name"],
+      "personality_tone": "gentle",
+      "usage_weight": 0.8,
+      "min_confidence": 0.3
+    },
+    {
+      "id": "goodbye_warm_1",
+      "category": "goodbye",
+      "emotion_tags": ["neutral"],
+      "conversation_type": "goodbye",
+      "base_template": "It's been wonderful talking with you {user_name}. Take care of yourself! 🌟",
+      "variations": [
+        "Thank you for sharing your time with me {user_name}. Until we chat again! 💙",
+        "I've really enjoyed our conversation {user_name}. Wishing you peace and joy! ✨",
+        "Take good care of yourself {user_name}. I'll be here whenever you need to talk! 🐘",
+        "It's always a pleasure chatting with you {user_name}. Be gentle with yourself! 🌸"
+      ],
+      "follow_up_questions": [],
+      "context_requirements": ["user_name"],
+      "personality_tone": "gentle",
+      "usage_weight": 1.0,
+      "min_confidence": 0.3
+    }
+  ]
+}
