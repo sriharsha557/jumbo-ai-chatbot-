@@ -78,7 +78,7 @@ instance/
 
 # Large files and directories
 assets/
-*.mp4
+# *.mp4  # Allow jumbo-demo.mp4 to be deployed
 *.avi
 *.mov
 *.mkv
