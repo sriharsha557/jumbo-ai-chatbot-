@@ -267,25 +267,18 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           <div style={styles.videoSection}>
             <h3 style={styles.videoTitle}>See Jumbo in Action</h3>
             <div style={styles.videoContainer}>
-              {/* Replace this with your actual video */}
               <video 
                 controls 
                 style={styles.video}
-                poster="/jumbo-video-thumbnail.jpg" // Optional: add a thumbnail image
+                poster="/jumbo-logo.png"
               >
                 <source src="/jumbo-demo.mp4" type="video/mp4" />
-                <source src="/jumbo-demo.webm" type="video/webm" />
-                {/* Fallback for browsers that don't support video */}
-                <div style={styles.videoPlaceholder}>
-                  <div style={styles.playButton}>
-                    <div style={styles.playIcon}>▶</div>
-                  </div>
-                  <p style={styles.videoText}>
-                    Your browser doesn't support video playback. 
-                    <a href="/jumbo-demo.mp4" style={{color: 'white'}}>Download the video</a>
-                  </p>
-                </div>
+                Your browser doesn't support video playback. 
+                <a href="/jumbo-demo.mp4" style={{color: 'white'}}>Download the video</a>
               </video>
+              <p style={styles.videoDescription}>
+                Watch how Jumbo provides empathetic support and builds meaningful conversations
+              </p>
             </div>
           </div>
 
@@ -740,11 +733,12 @@ const styles = {
   },
   video: {
     width: '100%',
-    maxWidth: '800px',
+    maxWidth: '600px',
     height: 'auto',
     borderRadius: '16px',
     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
     border: '1px solid rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   videoPlaceholder: {
     position: 'relative',
@@ -778,6 +772,13 @@ const styles = {
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: '1.5',
     margin: 0,
+    fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
+  },
+  videoDescription: {
+    fontSize: '1rem',
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: '1.5',
+    marginTop: '16px',
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
 
