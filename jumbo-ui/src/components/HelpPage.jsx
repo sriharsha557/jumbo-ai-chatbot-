@@ -5,6 +5,32 @@ import { theme } from '../theme/theme';
 
 function HelpPage({ onBack, onLogin }) {
   const [expandedSection, setExpandedSection] = useState(null);
+  const [videoLoaded, setVideoLoaded] = React.useState(false);
+  const [videoError, setVideoError] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 100;
+      setScrolled(isScrolled);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Attempt to play video manually if autoplay fails
+  React.useEffect(() => {
+    const video = document.querySelector('video');
+    if (video) {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Autoplay prevented:', error);
+        });
+      }
+    }
+  }, [videoLoaded]);
 
   const toggleSection = (sectionId) => {
     setExpandedSection(expandedSection === sectionId ? null : sectionId);
@@ -160,7 +186,51 @@ function HelpPage({ onBack, onLogin }) {
   ];
 
   return (
-    <GradientBackground variant="copilot" animated={true} style={styles.container}>
+    <div style={styles.container}>
+      {/* Background Video */}
+      {!videoError && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          style={{
+            ...styles.backgroundVideo,
+            opacity: videoLoaded ? 0.6 : 0.2,
+            transition: 'opacity 1s ease-in-out'
+          }}
+          onError={(e) => {
+            console.log('Video failed to load:', e);
+            setVideoError(true);
+          }}
+          onLoadedData={() => {
+            console.log('Video loaded successfully');
+            setVideoLoaded(true);
+          }}
+          onCanPlay={() => {
+            console.log('Video can play');
+            setVideoLoaded(true);
+          }}
+          onPlay={() => {
+            console.log('Video is playing');
+          }}
+        >
+          <source src="/Jumbo_Preview.mp4" type="video/mp4" />
+          <source src="/jumbo-demo.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      )}
+      
+      {/* Video Overlay for better text readability */}
+      <div style={{
+        ...styles.videoOverlay,
+        background: videoError || !videoLoaded 
+          ? 'linear-gradient(135deg, rgba(12, 20, 38, 0.8) 0%, rgba(30, 41, 59, 0.7) 50%, rgba(14, 165, 233, 0.6) 100%)'
+          : 'linear-gradient(135deg, rgba(12, 20, 38, 0.4) 0%, rgba(30, 41, 59, 0.3) 50%, rgba(14, 165, 233, 0.2) 100%)'
+      }}></div>
+
+    <GradientBackground variant="copilot" animated={true} style={styles.gradientContainer}>
       <style>{`
         .contact-form input::placeholder,
         .contact-form textarea::placeholder,
@@ -253,10 +323,21 @@ function HelpPage({ onBack, onLogin }) {
       `}</style>
       
       {/* Header with Back Button and Login */}
-      <div style={styles.header}>
+      <div style={{
+        ...styles.header,
+        borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+        background: scrolled ? 'rgba(0, 0, 0, 0.3)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
+      }}>
         <button 
           onClick={onBack}
-          style={styles.backButton}
+          style={{
+            ...styles.backButton,
+            background: scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+            border: scrolled ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)',
+            backdropFilter: scrolled ? 'blur(10px)' : 'none',
+          }}
           className="back-button"
           onMouseEnter={(e) => {
             e.target.style.background = 'rgba(255, 255, 255, 0.2)';
@@ -439,12 +520,40 @@ function HelpPage({ onBack, onLogin }) {
         </div>
       </div>
     </GradientBackground>
+    </div>
   );
 }
 
 const styles = {
   container: {
     minHeight: '100vh',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  backgroundVideo: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: 1,
+    pointerEvents: 'none',
+    transform: 'translateZ(0)', // Force hardware acceleration
+  },
+  videoOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(135deg, rgba(12, 20, 38, 0.7) 0%, rgba(30, 41, 59, 0.6) 50%, rgba(14, 165, 233, 0.5) 100%)',
+    zIndex: 2,
+  },
+  gradientContainer: {
+    minHeight: '100vh',
+    position: 'relative',
+    zIndex: 10,
   },
   header: {
     position: 'fixed',
@@ -456,9 +565,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '16px 24px',
-    background: 'rgba(0, 0, 0, 0.1)',
-    backdropFilter: 'blur(20px)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    transition: 'all 0.3s ease',
   },
   backButton: {
     display: 'flex',

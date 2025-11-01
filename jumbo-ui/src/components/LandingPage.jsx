@@ -1,8 +1,8 @@
 import React from 'react';
-import { Sparkles, Heart, Mic, MessageCircle, HelpCircle, LogIn, Smartphone } from 'lucide-react';
+import { Sparkles, Heart, Mic, MessageCircle, Info, LogIn, Smartphone } from 'lucide-react';
 import { theme } from '../theme/theme';
 
-function LandingPage({ onGetStarted, onHelp, onLogin }) {
+function LandingPage({ onGetStarted, onAbout, onHelp, onLogin }) {
   const [scrolled, setScrolled] = React.useState(false);
   const [videoLoaded, setVideoLoaded] = React.useState(false);
   const [videoError, setVideoError] = React.useState(false);
@@ -106,7 +106,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           .landing-content {
             padding: 120px 16px 20px !important;
           }
-          .help-button, .login-button {
+          .about-button, .login-button {
             padding: 8px 16px !important;
             font-size: 0.9rem !important;
           }
@@ -207,7 +207,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           .landing-content {
             padding: 120px 12px 16px !important;
           }
-          .help-button, .login-button {
+          .about-button, .login-button {
             padding: 6px 12px !important;
             font-size: 0.8rem !important;
           }
@@ -267,14 +267,14 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
         boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
       }}>
         <button 
-          onClick={onHelp}
+          onClick={onAbout}
           style={{
-            ...styles.helpButton,
+            ...styles.aboutButton,
             background: scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
             border: scrolled ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)',
             backdropFilter: scrolled ? 'blur(10px)' : 'none',
           }}
-          className="help-button"
+          className="about-button"
           onMouseEnter={(e) => {
             e.target.style.background = 'rgba(255, 255, 255, 0.25)';
           }}
@@ -282,8 +282,8 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
             e.target.style.background = scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)';
           }}
         >
-          <HelpCircle size={20} style={{ marginRight: '8px' }} />
-          Help
+          <Info size={20} style={{ marginRight: '8px' }} />
+          About
         </button>
         
         <button 
@@ -374,7 +374,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
               <div style={styles.stepContent}>
                 <h3 style={styles.stepTitle}>Share Your Feelings</h3>
                 <p style={styles.stepDescription}>
-                  Talk to Jumbo about anything on your mind. No judgment, no pressure - just a caring listener.
+                  Talk to Jumbo about anything. No judgment, just caring support.
                 </p>
               </div>
             </div>
@@ -384,7 +384,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
               <div style={styles.stepContent}>
                 <h3 style={styles.stepTitle}>Get Personalized Support</h3>
                 <p style={styles.stepDescription}>
-                  Jumbo understands your emotions and provides tailored responses to help you process and cope.
+                  Jumbo understands your emotions and provides tailored responses.
                 </p>
               </div>
             </div>
@@ -394,30 +394,13 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
               <div style={styles.stepContent}>
                 <h3 style={styles.stepTitle}>Build Emotional Resilience</h3>
                 <p style={styles.stepDescription}>
-                  Over time, Jumbo learns about you and helps develop healthy coping strategies and emotional awareness.
+                  Jumbo learns about you and helps develop healthy coping strategies.
                 </p>
               </div>
             </div>
           </div>
           
-          {/* Video Section */}
-          <div style={styles.videoSection}>
-            <h3 style={styles.videoTitle}>What is Jumbo?</h3>
-            <div style={styles.videoContainer}>
-              <video 
-                controls 
-                style={styles.video}
-                poster="/jumbo-logo.png"
-              >
-                <source src="/jumbo-demo.mp4" type="video/mp4" />
-                Your browser doesn't support video playback. 
-                <a href="/jumbo-demo.mp4" style={{color: 'white'}}>Download the video</a>
-              </video>
-              <p style={styles.videoDescription}>
-                Discover Jumbo's AI-powered emotional support and see how it creates meaningful, empathetic conversations
-              </p>
-            </div>
-          </div>
+
 
         </div>
 
@@ -503,7 +486,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           </div>
           
           <button 
-            onClick={onHelp}
+            onClick={onAbout}
             style={styles.learnMoreButton}
             onMouseEnter={(e) => {
               e.target.style.background = 'rgba(255, 255, 255, 0.2)';
@@ -512,7 +495,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
               e.target.style.background = 'rgba(255, 255, 255, 0.1)';
             }}
           >
-            Learn More in Help Center
+            See Our Mission & Demo
           </button>
         </div>
 
@@ -527,7 +510,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           
           <div style={styles.contactOptions}>
             <button 
-              onClick={onHelp}
+              onClick={onAbout}
               style={styles.contactButton}
               onMouseEnter={(e) => {
                 e.target.style.background = 'rgba(255, 255, 255, 0.2)';
@@ -536,7 +519,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
                 e.target.style.background = 'rgba(255, 255, 255, 0.1)';
               }}
             >
-              Visit Help Center
+              Learn About Jumbo
             </button>
             <button 
               onClick={onHelp}
@@ -548,7 +531,7 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
                 e.target.style.background = 'rgba(255, 255, 255, 0.1)';
               }}
             >
-              Contact Us
+              Get Help & FAQ
             </button>
           </div>
         </div>
@@ -603,7 +586,7 @@ const styles = {
     padding: '16px 24px',
     transition: 'all 0.3s ease',
   },
-  helpButton: {
+  aboutButton: {
     display: 'flex',
     alignItems: 'center',
     padding: '10px 20px',
@@ -890,6 +873,8 @@ const styles = {
     padding: '24px',
     borderRadius: '16px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
+    maxWidth: '350px',
+    margin: '0 auto',
   },
   stepNumber: {
     width: '48px',
@@ -907,6 +892,7 @@ const styles = {
   },
   stepContent: {
     flex: 1,
+    maxWidth: '250px',
   },
   stepTitle: {
     fontSize: '1.3rem',

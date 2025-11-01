@@ -3,6 +3,7 @@ import Navigation from './components/Navigation';
 import ChatPage from './components/ChatPage';
 import AuthPage from './components/AuthPageSupabase';
 import LandingPage from './components/LandingPage';
+import AboutPage from './components/AboutPage';
 import HelpPage from './components/HelpPage';
 import OnboardingFlow from './components/OnboardingFlow';
 import WelcomePage from './components/WelcomePage';
@@ -269,6 +270,10 @@ function App() {
     setCurrentPage('auth');
   };
 
+  const handleAbout = () => {
+    setCurrentPage('about');
+  };
+
   const handleHelp = () => {
     setCurrentPage('help');
   };
@@ -319,10 +324,13 @@ function App() {
     if (currentPage === 'auth') {
       return <AuthPage onUserLogin={handleUserLogin} />;
     }
+    if (currentPage === 'about') {
+      return <AboutPage onBack={handleBackToLanding} onHelp={handleHelp} onLogin={handleLogin} />;
+    }
     if (currentPage === 'help') {
       return <HelpPage onBack={handleBackToLanding} onLogin={handleLogin} />;
     }
-    return <LandingPage onGetStarted={handleGetStarted} onHelp={handleHelp} onLogin={handleLogin} />;
+    return <LandingPage onGetStarted={handleGetStarted} onAbout={handleAbout} onHelp={handleHelp} onLogin={handleLogin} />;
   }
 
   // If user needs onboarding, show onboarding flow
