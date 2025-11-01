@@ -402,19 +402,19 @@ function LandingPage({ onGetStarted, onHelp, onLogin }) {
           
           {/* Video Section */}
           <div style={styles.videoSection}>
-            <h3 style={styles.videoTitle}>See Jumbo in Action</h3>
+            <h3 style={styles.videoTitle}>What is Jumbo?</h3>
             <div style={styles.videoContainer}>
               <video 
                 controls 
                 style={styles.video}
                 poster="/jumbo-logo.png"
               >
-                <source src="/Jumbo_Preview.mp4" type="video/mp4" />
+                <source src="/jumbo-demo.mp4" type="video/mp4" />
                 Your browser doesn't support video playback. 
-                <a href="/Jumbo_Preview.mp4" style={{color: 'white'}}>Download the video</a>
+                <a href="/jumbo-demo.mp4" style={{color: 'white'}}>Download the video</a>
               </video>
               <p style={styles.videoDescription}>
-                Watch how Jumbo provides empathetic support and builds meaningful conversations
+                Discover Jumbo's AI-powered emotional support and see how it creates meaningful, empathetic conversations
               </p>
             </div>
           </div>
