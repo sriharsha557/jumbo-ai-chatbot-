@@ -19,6 +19,7 @@ function AppContent() {
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
   const [welcomeShownThisSession, setWelcomeShownThisSession] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const checkOnboardingStatus = async (userData) => {
     setIsCheckingOnboarding(true);
@@ -131,6 +132,17 @@ function AppContent() {
     setNeedsOnboarding(false);
     setWelcomeShownThisSession(false);
   };
+
+  // Add scroll detection for navigation styling
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Initialize app - check for Supabase session and stored user
   useEffect(() => {
@@ -372,6 +384,7 @@ function AppContent() {
         onNavigate={(page) => navigate(`/${page}`)}
         userName={currentUser.name}
         onLogout={handleLogout}
+        scrolled={isScrolled}
       />
       
       <main style={{ paddingTop: '80px' }}>

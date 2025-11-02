@@ -64,11 +64,13 @@ function Navigation({ currentPage, onNavigate, userName, onLogout, scrolled = fa
               onMouseEnter={(e) => {
                 if (currentPage !== item.id) {
                   e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.transform = 'translateY(-1px)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (currentPage !== item.id) {
                   e.target.style.background = 'none';
+                  e.target.style.transform = 'translateY(0)';
                 }
               }}
             >
@@ -165,12 +167,12 @@ const styles = {
     boxShadow: 'none',
   },
   navbarScrolled: {
-    background: 'rgba(15, 23, 42, 0.85)',
+    background: 'rgba(15, 23, 42, 0.8)',
     backdropFilter: 'blur(24px)',
     WebkitBackdropFilter: 'blur(24px)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
   },
   navContainer: {
     maxWidth: '1200px',
@@ -226,9 +228,10 @@ const styles = {
     transition: 'all 0.3s',
   },
   navLinkActive: {
-    background: 'rgba(59, 130, 246, 0.3)', // Blue active background
+    background: 'rgba(139, 92, 246, 0.3)', // Purple active background to match theme
     color: 'white',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Briskey, sans-serif',
+    boxShadow: '0 0 20px rgba(139, 92, 246, 0.2)',
   },
   userSection: {
     display: 'flex',
@@ -262,11 +265,14 @@ const styles = {
     cursor: 'pointer',
   },
   mobileNav: {
-    background: 'rgba(0, 0, 0, 0.1)',
+    background: 'rgba(15, 23, 42, 0.9)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     padding: '12px 24px',
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
   },
   mobileNavLink: {
     background: 'rgba(255, 255, 255, 0.1)',
@@ -281,8 +287,9 @@ const styles = {
     textAlign: 'left',
   },
   mobileNavLinkActive: {
-    background: 'rgba(255, 255, 255, 0.3)',
+    background: 'rgba(139, 92, 246, 0.3)',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Briskey, sans-serif',
+    boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)',
   },
 };
 
