@@ -111,7 +111,9 @@ const OnboardingFlow = ({ onComplete }) => {
               'Authorization': `Bearer ${userData.access_token}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(finalOnboardingData)
+            body: JSON.stringify({
+              onboarding_data: finalOnboardingData
+            })
           });
           
           if (response.ok) {

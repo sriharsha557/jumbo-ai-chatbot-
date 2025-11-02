@@ -217,6 +217,51 @@ def create_onboarding_blueprint(supabase_service, auth_service):
             data = request.json
             final_onboarding_data = data.get('onboarding_data', {})
             
+            # Extract profile fields from onboarding data
+            profile_updates = {
+                'onboarding_completed': True,
+                'onboarding_data': final_onboarding_data
+            }
+            
+            # Map onboarding step data to profile fields
+            if 'step_2' in final_onboarding_data:
+                step_2_data = final_onboarding_data['step_2']
+                if 'display_name' in step_2_data:
+                    profile_updates['display_name'] = step_2_data['display_name']
+                    profile_updates['preferred_name'] = step_2_data['display_name']  # Also set preferred_name
+                if 'pronouns' in step_2_data:
+                    profile_updates['pronouns'] = step_2_data['pronouns']
+                if 'preferred_language' in step_2_data:
+                    profile_updates['preferred_language'] = step_2_data['preferred_language']
+            
+            if 'step_3' in final_onboarding_data:
+                step_3_data = final_onboarding_data['step_3']
+                if 'current_mood' in step_3_data:
+                    profile_updates['current_mood'] = step_3_data['current_mood']
+                if 'emotion_comfort_level' in step_3_data:
+                    profile_updates['emotion_comfort_level'] = step_3_data['emotion_comfort_level']
+            
+            if 'step_4' in final_onboarding_data:
+                step_4_data = final_onboarding_data['step_4']
+                if 'support_style' in step_4_data:
+                    profile_updates['support_style'] = step_4_data['support_style']
+                if 'communication_tone' in step_4_data:
+                    profile_updates['communication_tone'] = step_4_data['communication_tone']
+            
+            if 'step_5' in final_onboarding_data:
+                step_5_data = final_onboarding_data['step_5']
+                if 'selected_areas' in step_5_data:
+                    profile_updates['focus_areas'] = step_5_data['selected_areas']
+            
+            if 'step_6' in final_onboarding_data:
+                step_6_data = final_onboarding_data['step_6']
+                if 'frequency' in step_6_data:
+                    profile_updates['checkin_frequency'] = step_6_data['frequency']
+                if 'time' in step_6_data:
+                    profile_updates['checkin_time'] = step_6_data['time']
+                if 'custom_time' in step_6_data:
+                    profile_updates['custom_checkin_time'] = step_6_data['custom_time']
+            
             # Check if user profile exists, create if not
             existing_profile = supabase_service.get_user_profile(user['user_id'])
             if not existing_profile:
@@ -224,18 +269,12 @@ def create_onboarding_blueprint(supabase_service, auth_service):
                 # Create profile with onboarding data
                 create_data = {
                     'name': user.get('name', 'User'),  # Required field
-                    'display_name': user.get('name', 'User'),
-                    'onboarding_completed': True,
-                    'onboarding_data': final_onboarding_data
+                    **profile_updates  # Include all mapped data
                 }
                 success, message = supabase_service.create_user_profile(user['user_id'], create_data)
             else:
                 # Update existing profile
-                update_data = {
-                    'onboarding_completed': True,
-                    'onboarding_data': final_onboarding_data
-                }
-                success, message = supabase_service.update_user_profile(user['user_id'], update_data)
+                success, message = supabase_service.update_user_profile(user['user_id'], profile_updates)
             
             if success:
                 logger.info(f"User {user['user_id']} completed onboarding")
@@ -257,9 +296,12 @@ def create_onboarding_blueprint(supabase_service, auth_service):
                 'message': 'Failed to complete onboarding'
             }), 500
     
-    @onboarding_bp.route('/preferences', methods=['GET'])
+    @onboarding_bp.route('/preferences', methods=['GET', 'OPTIONS'])
     def get_user_preferences():
         """Get user preferences for personalizing AI responses"""
+        # Handle CORS preflight request
+        if request.method == 'OPTIONS':
+            return '', 200
         try:
             # Get current user
             user = get_authenticated_user()
