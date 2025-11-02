@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import ChatPage from './components/ChatPage';
 import AuthPage from './components/AuthPageSupabase';
@@ -10,8 +11,9 @@ import WelcomePage from './components/WelcomePage';
 import ProfilePage from './components/ProfilePage';
 import './App.css';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('landing'); // Always start with landing
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
@@ -27,12 +29,6 @@ function App() {
       
       if (storedOnboardingStatus === 'true') {
         console.log('✅ Onboarding completed (from localStorage)');
-        // Check if welcome page should be shown this session
-        if (!welcomeShownThisSession) {
-          setCurrentPage('welcome');
-        } else {
-          setCurrentPage('chat');
-        }
         setNeedsOnboarding(false);
         setIsCheckingOnboarding(false);
         return;
@@ -62,21 +58,13 @@ function App() {
         if (data.completed) {
           console.log('✅ Onboarding completed (from API)');
           localStorage.setItem('jumbo_onboarding_completed', 'true');
-          // Check if welcome page should be shown this session
-          if (!welcomeShownThisSession) {
-            setCurrentPage('welcome');
-          } else {
-            setCurrentPage('chat');
-          }
           setNeedsOnboarding(false);
         } else {
           console.log('⏳ Onboarding needed');
-          setCurrentPage('onboarding');
           setNeedsOnboarding(true);
         }
       } else {
         console.log('⚠️ API check failed, assuming onboarding needed');
-        setCurrentPage('onboarding');
         setNeedsOnboarding(true);
       }
     } catch (error) {
@@ -85,16 +73,9 @@ function App() {
       const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
       if (storedOnboardingStatus === 'true') {
         console.log('✅ Using localStorage fallback - onboarding completed');
-        // Check if welcome page should be shown this session
-        if (!welcomeShownThisSession) {
-          setCurrentPage('welcome');
-        } else {
-          setCurrentPage('chat');
-        }
         setNeedsOnboarding(false);
       } else {
         console.log('⏳ Using localStorage fallback - onboarding needed');
-        setCurrentPage('onboarding');
         setNeedsOnboarding(true);
       }
     } finally {
@@ -111,7 +92,7 @@ function App() {
     // Update state
     setNeedsOnboarding(false);
     // After onboarding, go to welcome page
-    setCurrentPage('welcome');
+    navigate('/welcome');
     setIsCheckingOnboarding(false);
   };
 
@@ -127,7 +108,7 @@ function App() {
     }
     
     // Navigate to chat
-    setCurrentPage('chat');
+    navigate('/chat');
   };
 
   const handleLogout = async () => {
@@ -146,7 +127,7 @@ function App() {
     localStorage.removeItem('jumbo_mood_history');
     
     setCurrentUser(null);
-    setCurrentPage('landing');
+    navigate('/');
     setNeedsOnboarding(false);
     setWelcomeShownThisSession(false);
   };
@@ -212,8 +193,8 @@ function App() {
             setCurrentUser(userData);
             
             // For new Google login, go to onboarding
-            setCurrentPage('onboarding');
             setNeedsOnboarding(true);
+            navigate('/onboarding');
           }
           
           if (event === 'SIGNED_OUT') {
@@ -222,7 +203,7 @@ function App() {
             localStorage.removeItem('jumbo_current_session_mood');
             localStorage.removeItem('jumbo_mood_history');
             setCurrentUser(null);
-            setCurrentPage('landing');
+            navigate('/');
             setNeedsOnboarding(false);
             setWelcomeShownThisSession(false);
           }
@@ -259,7 +240,7 @@ function App() {
     // For now, assume new users need onboarding
     // TODO: Fix Flask API authentication to properly check onboarding status
     console.log('Setting up onboarding for new user');
-    setCurrentPage('onboarding');
+    navigate('/onboarding');
     setNeedsOnboarding(true);
     
     // Temporarily comment out the API call until Flask auth is fixed
@@ -267,27 +248,27 @@ function App() {
   };
 
   const handleGetStarted = () => {
-    setCurrentPage('auth');
+    navigate('/auth');
   };
 
   const handleAbout = () => {
-    setCurrentPage('about');
+    navigate('/about');
   };
 
   const handleHelp = () => {
-    setCurrentPage('help');
+    navigate('/help');
   };
 
   const handleLogin = () => {
-    setCurrentPage('auth');
+    navigate('/auth');
   };
 
   const handleBackToLanding = () => {
-    setCurrentPage('landing');
+    navigate('/');
   };
 
   const handleHome = () => {
-    setCurrentPage('landing');
+    navigate('/');
   };
 
   // Show loading state while checking for existing session or onboarding status
@@ -323,50 +304,100 @@ function App() {
     );
   }
 
-  // If no user, show landing, help, or auth page
+  // Handle routing based on authentication and onboarding status
   if (!currentUser) {
-    if (currentPage === 'auth') {
-      return <AuthPage onUserLogin={handleUserLogin} />;
-    }
-    if (currentPage === 'about') {
-      return <AboutPage onBack={handleBackToLanding} onHelp={handleHelp} onHome={handleHome} onLogin={handleLogin} />;
-    }
-    if (currentPage === 'help') {
-      return <HelpPage onBack={handleBackToLanding} onLogin={handleLogin} />;
-    }
-    return <LandingPage onGetStarted={handleGetStarted} onAbout={handleAbout} onHelp={handleHelp} onHome={handleHome} onLogin={handleLogin} />;
+    return (
+      <Routes>
+        <Route path="/" element={
+          <LandingPage 
+            onGetStarted={handleGetStarted} 
+            onAbout={handleAbout} 
+            onHelp={handleHelp} 
+            onLogin={handleLogin} 
+          />
+        } />
+        <Route path="/about" element={
+          <AboutPage 
+            onBack={handleBackToLanding} 
+            onHelp={handleHelp} 
+            onLogin={handleLogin} 
+          />
+        } />
+        <Route path="/help" element={
+          <HelpPage 
+            onBack={handleBackToLanding} 
+            onLogin={handleLogin} 
+          />
+        } />
+        <Route path="/auth" element={
+          <AuthPage onUserLogin={handleUserLogin} />
+        } />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
   }
 
-  // If user needs onboarding, show onboarding flow
-  if (needsOnboarding && currentPage === 'onboarding') {
-    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  // If user needs onboarding
+  if (needsOnboarding) {
+    return (
+      <Routes>
+        <Route path="/onboarding" element={
+          <OnboardingFlow onComplete={handleOnboardingComplete} />
+        } />
+        <Route path="*" element={<Navigate to="/onboarding" replace />} />
+      </Routes>
+    );
   }
 
-  // If user should see welcome page, show it
-  if (currentPage === 'welcome') {
-    return <WelcomePage currentUser={currentUser} onContinueToChat={handleWelcomeComplete} />;
+  // If user should see welcome page first
+  if (location.pathname === '/welcome' || (!welcomeShownThisSession && location.pathname === '/')) {
+    return (
+      <Routes>
+        <Route path="/welcome" element={
+          <WelcomePage 
+            currentUser={currentUser} 
+            onContinueToChat={handleWelcomeComplete} 
+          />
+        } />
+        <Route path="*" element={<Navigate to="/welcome" replace />} />
+      </Routes>
+    );
   }
 
-  // If user logged in, show main app with navigation
+  // Authenticated user with main app
   return (
     <>
       <Navigation 
-        currentPage={currentPage} 
-        onNavigate={setCurrentPage}
+        currentPage={location.pathname.slice(1) || 'chat'} 
+        onNavigate={(page) => navigate(`/${page}`)}
         userName={currentUser.name}
         onLogout={handleLogout}
       />
       
       <main style={{ paddingTop: '80px' }}>
-        {currentPage === 'chat' && (
-          <ChatPage 
-            currentUser={currentUser} 
-            sessionMoodData={JSON.parse(localStorage.getItem('jumbo_current_session_mood') || 'null')}
-          />
-        )}
-        {currentPage === 'profile' && <ProfilePage currentUser={currentUser} />}
+        <Routes>
+          <Route path="/chat" element={
+            <ChatPage 
+              currentUser={currentUser} 
+              sessionMoodData={JSON.parse(localStorage.getItem('jumbo_current_session_mood') || 'null')}
+            />
+          } />
+          <Route path="/profile" element={
+            <ProfilePage currentUser={currentUser} />
+          } />
+          <Route path="/" element={<Navigate to="/chat" replace />} />
+          <Route path="*" element={<Navigate to="/chat" replace />} />
+        </Routes>
       </main>
     </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 
