@@ -66,11 +66,11 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
           Your browser does not support the video tag.
         </video>
       )}
-      
+
       {/* Video Overlay for better text readability */}
       <div style={{
         ...styles.videoOverlay,
-        background: videoError || !videoLoaded 
+        background: videoError || !videoLoaded
           ? 'linear-gradient(135deg, rgba(12, 20, 38, 0.8) 0%, rgba(30, 41, 59, 0.7) 50%, rgba(14, 165, 233, 0.6) 100%)'
           : 'linear-gradient(135deg, rgba(12, 20, 38, 0.4) 0%, rgba(30, 41, 59, 0.3) 50%, rgba(14, 165, 233, 0.2) 100%)'
       }}></div>
@@ -83,8 +83,8 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
         boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
       }}>
         {/* Left: Back Button */}
-        <button 
-          onClick={onBack} 
+        <button
+          onClick={onBack}
           style={{
             ...styles.backButton,
             background: scrolled ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
@@ -95,9 +95,9 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
           <ArrowLeft size={20} style={{ marginRight: '8px' }} />
           Back
         </button>
-        
+
         {/* Center: Logo (Home Button) */}
-        <button 
+        <button
           onClick={onHome || onBack}
           style={styles.homeLogoButton}
           onMouseEnter={(e) => {
@@ -109,15 +109,15 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
             e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
           }}
         >
-          <img 
-            src="/jumbo-logo.png" 
-            alt="Jumbo Home" 
+          <img
+            src="/jumbo-logo.png"
+            alt="Jumbo Home"
             style={styles.navLogo}
           />
         </button>
-        
+
         {/* Right: Get Started Button */}
-        <button 
+        <button
           onClick={onLogin}
           style={styles.loginButton}
           onMouseEnter={(e) => {
@@ -178,34 +178,34 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
         {/* Hero Section */}
         <div style={styles.hero}>
           <div style={styles.logoContainer}>
-            <img 
-              src="/jumbo-logo.png" 
-              alt="Jumbo Logo" 
+            <img
+              src="/jumbo-logo.png"
+              alt="Jumbo Logo"
               style={styles.logo}
             />
           </div>
-          
+
           <h1 style={styles.title} className="about-title">What is Jumbo?</h1>
-          
+
           <p style={styles.mission}>
-            🐘 <strong>Mission:</strong> Jumbo aims to make emotional check-ins as natural as checking the weather, 
+            🐘 <strong>Mission:</strong> Jumbo aims to make emotional check-ins as natural as checking the weather,
             fostering genuine human connection in a digital world with your elephant mascot as a gentle, supportive companion.
           </p>
         </div>
 
         {/* Demo Video Section */}
         <div style={styles.videoSection}>
-          <h2 style={styles.videoTitle}>See Jumbo in Action</h2>
+          <h2 style={styles.videoTitle}>Why Jumbo Changes Everything</h2>
           <div style={styles.videoContainer}>
-            <video 
-              controls 
+            <video
+              controls
               style={styles.video}
               className="about-video"
               poster="/jumbo-logo.png"
             >
               <source src="/jumbo-demo.mp4" type="video/mp4" />
-              Your browser doesn't support video playback. 
-              <a href="/jumbo-demo.mp4" style={{color: '#8b5cf6'}}>Download the video</a>
+              Your browser doesn't support video playback.
+              <a href="/jumbo-demo.mp4" style={{ color: '#8b5cf6' }}>Download the video</a>
             </video>
             <p style={styles.videoDescription}>
               Discover how Jumbo creates meaningful, empathetic conversations and supports emotional well-being
@@ -217,7 +217,7 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
         <div style={styles.conceptSection}>
           <h2 style={styles.sectionTitle}>Core Concept</h2>
           <p style={styles.conceptDescription}>
-            An emotional well-being app that helps users express their mood, check on friends, 
+            An emotional well-being app that helps users express their mood, check on friends,
             and understand the emotional vibe of their community through gentle, non-intrusive connections.
           </p>
         </div>
@@ -225,7 +225,7 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
         {/* Key Features */}
         <div style={styles.featuresSection}>
           <h2 style={styles.sectionTitle}>Key Features</h2>
-          
+
           <div style={styles.features} className="about-features">
             <div style={styles.feature}>
               <div style={styles.featureIcon}>
@@ -278,7 +278,7 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
                   <li>Mental health support is often reactive, not proactive</li>
                 </ul>
               </div>
-              
+
               <div style={styles.solution}>
                 <h3 style={styles.solutionTitle}>Our Solution</h3>
                 <ul style={styles.solutionList}>
@@ -312,7 +312,7 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
             </div>
             <h3 style={styles.audienceTitle}>Built For</h3>
             <p style={styles.audienceDescription}>
-              Young adults 18-35, college students, remote workers, and empathetic communities 
+              Young adults 18-35, college students, remote workers, and empathetic communities
               who value genuine connection and emotional well-being.
             </p>
           </div>
@@ -322,7 +322,7 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
         <div style={styles.ctaSection}>
           <h2 style={styles.ctaTitle}>Ready to Start Your Emotional Wellness Journey?</h2>
           <div style={styles.ctaButtons} className="about-cta-buttons">
-            <button 
+            <button
               onClick={onLogin}
               style={styles.ctaButton}
               onMouseEnter={(e) => {
@@ -336,8 +336,8 @@ function AboutPage({ onBack, onHelp, onHome, onLogin }) {
             >
               Join Jumbo Today - It's Free
             </button>
-            
-            <button 
+
+            <button
               onClick={onHelp}
               style={styles.helpButton}
               onMouseEnter={(e) => {

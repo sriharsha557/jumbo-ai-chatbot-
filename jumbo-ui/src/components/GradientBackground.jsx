@@ -65,7 +65,7 @@ const GradientBackground = ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: hasNavigation ? 'flex-start' : 'center', // Don't center vertically when navigation is present
     paddingTop: hasNavigation ? '72px' : '0', // Account for fixed navigation only when needed
     boxSizing: 'border-box',
     ...gradientVariants[variant],
@@ -96,7 +96,7 @@ const GradientBackground = ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: hasNavigation ? 'flex-start' : 'center', // Don't center vertically when navigation is present
     margin: '0 auto', // Ensure horizontal centering
   };
 

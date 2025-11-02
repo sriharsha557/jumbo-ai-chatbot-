@@ -350,18 +350,19 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
             }}
           >
             <Sparkles size={20} style={{ marginRight: '8px' }} />
-            Start Your Journey - It's Free
+            Start Your Journey – It's Free (Beta Access)
           </button>
           
           <div style={styles.comingSoonMessage}>
             <Smartphone size={18} style={{ marginRight: '8px' }} />
             Coming Soon to Android & iOS Devices
           </div>
+
           
           <div style={styles.trustBadges} className="trust-badges">
             <span style={styles.trustBadge} className="trust-badge">🔒 100% Private & Secure</span>
-            <span style={styles.trustBadge} className="trust-badge">🆓 Always Free to Use</span>
-            <span style={styles.trustBadge} className="trust-badge">⚡ No Setup Required</span>
+            <span style={styles.trustBadge} className="trust-badge">🆓 Free During Beta Period</span>
+            <span style={styles.trustBadge} className="trust-badge">⚡ Subscription Plans Coming Later</span>
           </div>
         </div>
 
@@ -470,9 +471,9 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
           
           <div style={styles.quickFeatures} className="quick-features">
             <div style={styles.quickFeature}>🔒 100% Private & Secure</div>
-            <div style={styles.quickFeature}>🧠 Evidence-Based Support</div>
+            <div style={styles.quickFeature}>🆓 Free During Beta Period</div>
+            <div style={styles.quickFeature}>⚡ Subscription Plans Coming Later</div>
             <div style={styles.quickFeature}>🌍 Available 24/7</div>
-            <div style={styles.quickFeature}>🆓 Always Free</div>
           </div>
           
           <button 
@@ -697,6 +698,7 @@ const styles = {
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
     fontWeight: '500',
   },
+
   features: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',

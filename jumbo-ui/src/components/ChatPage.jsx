@@ -245,6 +245,9 @@ function ChatPage({ currentUser, sessionMoodData }) {
   }, [currentUser, handleSendMessage]);
 
   const speakResponse = async (text) => {
+    console.log('🔊 Speech enabled:', isSpeechEnabled);
+    console.log('🎧 Audio devices check - please ensure headphones are set as default audio device');
+    
     // Always set screen state back to listening if speech is disabled
     if (!isSpeechEnabled) {
       console.log('🔇 Speech disabled - showing text only');
@@ -260,12 +263,17 @@ function ChatPage({ currentUser, sessionMoodData }) {
     }
 
     try {
+      console.log('🐘 Preparing to speak response:', text.substring(0, 50) + '...');
+      console.log('🎵 Speech synthesis info:', jumboVoice.getVoiceInfo());
+      
       setScreenState('responding');
       
       // Use Jumbo's gentle voice to speak the response
       await speakAsJumbo(text, {
+        volume: 1.0, // Maximum volume for better headphone output
         onStart: () => {
           console.log('🐘 Jumbo begins speaking with gentle voice');
+          console.log('🎧 If you can\'t hear audio, check your system\'s default audio device');
         },
         onEnd: () => {
           console.log('🐘 Jumbo finished speaking');
@@ -273,6 +281,7 @@ function ChatPage({ currentUser, sessionMoodData }) {
         },
         onError: (event) => {
           console.error('❌ Jumbo speech synthesis error:', event);
+          console.log('🎧 Speech error - this might be due to audio device routing');
           setScreenState('listening');
         }
       });
@@ -516,7 +525,13 @@ function ChatPage({ currentUser, sessionMoodData }) {
           {!isSpeechSupported ? 'Speech recognition not supported' :
             isMicActive ? '🎤 Listening... Speak now!' : 'Click microphone to speak'} • 
           Audio: {isSpeechEnabled ? '🔊 ON' : '🔇 OFF'}
+          {/iPad|iPhone|iPod/.test(navigator.userAgent) && (
+            <span style={{ display: 'block', fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>
+              🍎 iOS: Tap screen first to enable audio
+            </span>
+          )}
         </p>
+
 
         <div style={styles.textInputSection}>
           <input

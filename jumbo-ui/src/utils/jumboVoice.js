@@ -164,6 +164,9 @@ export class JumboVoice {
         // Cancel any ongoing speech
         this.synthesis.cancel();
 
+        // Ensure audio context is resumed (for headphones/audio devices)
+        this.ensureAudioContext();
+
         const utterance = this.createUtterance(text);
 
         // Apply any custom options
@@ -209,6 +212,46 @@ export class JumboVoice {
   stop() {
     if (this.synthesis) {
       this.synthesis.cancel();
+    }
+  }
+
+  /**
+   * Ensure audio context is active for proper audio routing (iOS-optimized)
+   */
+  ensureAudioContext() {
+    try {
+      // Create or resume audio context to ensure proper audio routing
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        if (!this.audioContext) {
+          this.audioContext = new AudioContextClass();
+        }
+        
+        // iOS-specific: Always try to resume audio context
+        if (this.audioContext.state === 'suspended') {
+          this.audioContext.resume().then(() => {
+            console.log('🐘 Audio context resumed for speech synthesis');
+          }).catch(err => {
+            console.warn('🐘 Could not resume audio context:', err);
+          });
+        }
+        
+        // iOS Safari fix: Create a silent buffer to "prime" the audio system
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          try {
+            const buffer = this.audioContext.createBuffer(1, 1, 22050);
+            const source = this.audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(this.audioContext.destination);
+            source.start(0);
+            console.log('🍎 iOS audio system primed');
+          } catch (primeError) {
+            console.warn('🍎 iOS audio priming failed:', primeError);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('🐘 Audio context initialization failed:', error);
     }
   }
 

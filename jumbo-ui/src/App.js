@@ -16,24 +16,32 @@ function AppContent() {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(() => {
+    // Initialize from localStorage to prevent flashing
+    const storedStatus = localStorage.getItem('jumbo_onboarding_completed');
+    return storedStatus !== 'true'; // Need onboarding if not completed
+  });
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
-  const [welcomeShownThisSession, setWelcomeShownThisSession] = useState(false);
+  const [welcomeShownThisSession, setWelcomeShownThisSession] = useState(() => {
+    // Check if welcome was shown in this session
+    return sessionStorage.getItem('jumbo_welcome_shown') === 'true';
+  });
   const [isScrolled, setIsScrolled] = useState(false);
 
   const checkOnboardingStatus = async (userData) => {
+    // First check localStorage for quick response (no loading state)
+    const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
+    
+    if (storedOnboardingStatus === 'true') {
+      console.log('✅ Onboarding completed (from localStorage)');
+      setNeedsOnboarding(false);
+      return; // Exit early, no need to check API
+    }
+    
+    // Only set loading state if we need to check API
     setIsCheckingOnboarding(true);
     
     try {
-      // First check localStorage for quick response
-      const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
-      
-      if (storedOnboardingStatus === 'true') {
-        console.log('✅ Onboarding completed (from localStorage)');
-        setNeedsOnboarding(false);
-        setIsCheckingOnboarding(false);
-        return;
-      }
       
       // If not in localStorage, check with API
       const apiUrl = process.env.REACT_APP_API_URL || (() => {
@@ -102,6 +110,7 @@ function AppContent() {
     
     // Mark welcome as shown for this session
     setWelcomeShownThisSession(true);
+    sessionStorage.setItem('jumbo_welcome_shown', 'true');
     
     // Store mood data if provided
     if (moodData) {
@@ -143,6 +152,11 @@ function AppContent() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Scroll to top when location changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // Initialize app - check for Supabase session and stored user
   useEffect(() => {
@@ -362,7 +376,7 @@ function AppContent() {
   }
 
   // If user should see welcome page first
-  if (location.pathname === '/welcome' || (!welcomeShownThisSession && location.pathname === '/')) {
+  if (location.pathname === '/welcome' || (!welcomeShownThisSession && (location.pathname === '/' || location.pathname === '/chat'))) {
     return (
       <Routes>
         <Route path="/welcome" element={

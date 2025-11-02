@@ -68,12 +68,19 @@ const MoodTrend = ({ currentUser, days = 7 }) => {
       // Add Authorization header if available
       if (currentUser.access_token) {
         headers['Authorization'] = `Bearer ${currentUser.access_token}`;
+        console.log('🔑 Using access token for mood history API');
+      } else {
+        console.warn('⚠️ No access token available for mood history API');
       }
+      
+      console.log('🌐 Fetching mood history from:', `${apiUrl}/mood/history?days=${days}&limit=50`);
 
       const response = await fetch(`${apiUrl}/mood/history?days=${days}&limit=50`, {
         method: 'GET',
         headers
       });
+      
+      console.log('📡 Mood history API response status:', response.status);
 
       if (response.ok) {
         const data = await response.json();

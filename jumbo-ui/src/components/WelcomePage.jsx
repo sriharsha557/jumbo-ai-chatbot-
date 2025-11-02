@@ -44,6 +44,11 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
   const [error, setError] = useState(null);
   const [preferredName, setPreferredName] = useState('');
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  
+  // Cache the name to avoid flickering on tab switches
+  const [cachedName, setCachedName] = useState(() => {
+    return localStorage.getItem('jumbo_cached_display_name') || '';
+  });
   const [showMoodTrend, setShowMoodTrend] = useState(false);
 
   // Initialize inspirational message, check for existing mood data, and fetch user profile
@@ -56,10 +61,40 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
     
     // Fetch user's preferred name from profile
     fetchUserProfile();
+    
+    // iOS Audio Context Fix - Initialize audio on first user interaction
+    const initializeAudioForIOS = () => {
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        console.log('🍎 iOS detected - initializing audio context');
+        // Create a silent audio context to enable audio
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioContext.state === 'suspended') {
+            audioContext.resume().then(() => {
+              console.log('🍎 iOS audio context resumed');
+            });
+          }
+        } catch (error) {
+          console.warn('🍎 iOS audio context initialization failed:', error);
+        }
+      }
+    };
+    
+    // Add listeners for iOS audio initialization
+    document.addEventListener('click', initializeAudioForIOS, { once: true });
+    document.addEventListener('touchstart', initializeAudioForIOS, { once: true });
+    
+    return () => {
+      document.removeEventListener('click', initializeAudioForIOS);
+      document.removeEventListener('touchstart', initializeAudioForIOS);
+    };
   }, []);
 
   const fetchUserProfile = async () => {
-    setIsLoadingProfile(true);
+    // Only show loading if we don't have cached name
+    if (!cachedName) {
+      setIsLoadingProfile(true);
+    }
     try {
       const apiUrl = process.env.REACT_APP_API_URL || (() => {
         if (process.env.NODE_ENV === 'production') {
@@ -74,12 +109,19 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
       // Add Authorization header if we have access token
       if (currentUser.access_token) {
         headers['Authorization'] = `Bearer ${currentUser.access_token}`;
+        console.log('🔑 Using access token for preferences API');
+      } else {
+        console.warn('⚠️ No access token available for preferences API');
       }
+      
+      console.log('🌐 Fetching preferences from:', `${apiUrl}/onboarding/preferences`);
       
       const response = await fetch(`${apiUrl}/onboarding/preferences`, {
         method: 'GET',
         headers
       });
+      
+      console.log('📡 Preferences API response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
@@ -90,19 +132,34 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
                              currentUser.email?.split('@')[0] || 
                              'there';
           setPreferredName(displayName);
-          console.log('✅ User preferences loaded:', { displayName, preferences: data.preferences });
+          setCachedName(displayName);
+          localStorage.setItem('jumbo_cached_display_name', displayName);
+          console.log('✅ User preferences loaded:', { 
+            displayName, 
+            preferences: data.preferences,
+            fullApiResponse: data 
+          });
         } else {
           // Fallback to current user name
           console.log('⚠️ No preferences found, using fallback name');
-          setPreferredName(getDefaultName());
+          const fallbackName = getDefaultName();
+          setPreferredName(fallbackName);
+          setCachedName(fallbackName);
+          localStorage.setItem('jumbo_cached_display_name', fallbackName);
         }
       } else {
         console.warn('⚠️ Failed to fetch user profile, using fallback name');
-        setPreferredName(getDefaultName());
+        const fallbackName = getDefaultName();
+        setPreferredName(fallbackName);
+        setCachedName(fallbackName);
+        localStorage.setItem('jumbo_cached_display_name', fallbackName);
       }
     } catch (error) {
       console.warn('⚠️ Error fetching user profile:', error);
-      setPreferredName(getDefaultName());
+      const fallbackName = getDefaultName();
+      setPreferredName(fallbackName);
+      setCachedName(fallbackName);
+      localStorage.setItem('jumbo_cached_display_name', fallbackName);
     } finally {
       setIsLoadingProfile(false);
     }
@@ -208,8 +265,8 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
     }
   };
 
-  // Use preferred name from profile, or fallback to default
-  const displayName = preferredName || getDefaultName();
+  // Use preferred name from profile, cached name while loading, or fallback to default
+  const displayName = preferredName || (isLoadingProfile ? cachedName : '') || getDefaultName();
 
   return (
     <GradientBackground variant="copilot" animated={true} style={styles.container}>
@@ -333,8 +390,10 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
           </div>
           
           <h1 style={styles.title} className="welcome-title">
-            {isLoadingProfile ? 'Hey! 🌼' : `Hey ${displayName}! 🌼`}
+            {isLoadingProfile && !cachedName ? 'Hey! 🌼' : `Hey ${displayName}! 🌼`}
           </h1>
+          
+
           
           <p style={styles.subtitle} className="welcome-subtitle">
             How are you feeling today?

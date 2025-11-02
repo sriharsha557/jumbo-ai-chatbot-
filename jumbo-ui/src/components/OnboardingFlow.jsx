@@ -86,7 +86,8 @@ const OnboardingFlow = ({ onComplete }) => {
         version: '1.0'
       };
       
-      console.log('Completing onboarding with data:', finalOnboardingData);
+      console.log('🔍 Completing onboarding with data:', finalOnboardingData);
+      console.log('🔍 Step 2 data (name):', finalOnboardingData.step_2);
       
       // Save to backend
       try {
@@ -95,7 +96,14 @@ const OnboardingFlow = ({ onComplete }) => {
           const userData = JSON.parse(storedUser);
           
           // Use environment variable for production
+          console.log('🔍 Environment check:', {
+            NODE_ENV: process.env.NODE_ENV,
+            REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+            allEnvVars: Object.keys(process.env).filter(key => key.startsWith('REACT_APP_'))
+          });
+          
           const apiUrl = process.env.REACT_APP_API_URL || (() => {
+            console.warn('⚠️ REACT_APP_API_URL not found, using fallback');
             if (process.env.NODE_ENV === 'production') {
               console.error('❌ REACT_APP_API_URL not set in production!');
               throw new Error('API_URL not configured for production');
