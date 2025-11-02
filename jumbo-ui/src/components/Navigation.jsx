@@ -18,6 +18,23 @@ function Navigation({ currentPage, onNavigate, userName, onLogout, scrolled = fa
   return (
     <>
       <style>{`
+        /* Navigation specific styles to override any global styles */
+        nav button {
+          background: none !important;
+          border: none !important;
+        }
+        
+        nav button.nav-link-active {
+          background: rgba(139, 92, 246, 0.3) !important;
+          color: white !important;
+          border: 1px solid rgba(139, 92, 246, 0.4) !important;
+        }
+        
+        /* Ensure no pink colors anywhere in navigation */
+        nav * {
+          color: inherit !important;
+        }
+        
         @media (max-width: 768px) {
           .desktop-nav {
             display: none !important;
@@ -57,6 +74,7 @@ function Navigation({ currentPage, onNavigate, userName, onLogout, scrolled = fa
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
+              className={currentPage === item.id ? 'nav-link-active' : ''}
               style={{
                 ...styles.navLink,
                 ...(currentPage === item.id ? styles.navLinkActive : {})
@@ -228,10 +246,11 @@ const styles = {
     transition: 'all 0.3s',
   },
   navLinkActive: {
-    background: 'rgba(139, 92, 246, 0.3)', // Purple active background to match theme
-    color: 'white',
+    background: 'rgba(139, 92, 246, 0.3) !important', // Purple active background to match theme
+    color: 'white !important',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Briskey, sans-serif',
-    boxShadow: '0 0 20px rgba(139, 92, 246, 0.2)',
+    boxShadow: '0 0 20px rgba(139, 92, 246, 0.2) !important',
+    border: '1px solid rgba(139, 92, 246, 0.4) !important',
   },
   userSection: {
     display: 'flex',
@@ -287,9 +306,10 @@ const styles = {
     textAlign: 'left',
   },
   mobileNavLinkActive: {
-    background: 'rgba(139, 92, 246, 0.3)',
+    background: 'rgba(139, 92, 246, 0.3) !important',
     fontFamily: theme.typography?.fontFamily?.briskey?.join(', ') || 'Briskey, sans-serif',
-    boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)',
+    boxShadow: '0 0 15px rgba(139, 92, 246, 0.2) !important',
+    border: '1px solid rgba(139, 92, 246, 0.4) !important',
   },
 };
 
