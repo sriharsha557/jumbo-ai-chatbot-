@@ -28,6 +28,16 @@ class LLMService:
                 logger.info("Groq LLM initialized successfully")
                 print("✓ Groq LLM initialized successfully")
                 
+            except TypeError as e:
+                if "proxies" in str(e):
+                    logger.error(f"Groq proxies error (likely version mismatch): {e}")
+                    print(f"✗ Groq proxies error - this is usually a version issue")
+                    print(f"✗ Try: pip install --upgrade groq")
+                else:
+                    logger.error(f"Groq TypeError: {e}")
+                    print(f"✗ Groq TypeError: {e}")
+                print(f"✗ LLM will be disabled, but chat will work with fallback responses")
+                self.enabled = False
             except Exception as e:
                 logger.error(f"Failed to initialize Groq: {e}")
                 print(f"✗ Failed to initialize Groq: {e}")
