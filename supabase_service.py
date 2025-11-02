@@ -165,7 +165,8 @@ class SupabaseService:
     def update_user_profile(self, user_id: str, updates: Dict) -> Tuple[bool, str]:
         """Update user profile"""
         try:
-            response = self.supabase.table('profiles').update(updates).eq('id', user_id).execute()
+            # Use admin client to bypass RLS for profile updates
+            response = self.admin_client.table('profiles').update(updates).eq('id', user_id).execute()
             
             if response.data:
                 return True, "Profile updated successfully"
