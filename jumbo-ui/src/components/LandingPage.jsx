@@ -241,6 +241,39 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
             grid-template-columns: 1fr !important;
             gap: 8px !important;
           }
+          
+          /* Steps responsive styles */
+          .steps-container {
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          
+          .step {
+            min-width: 100% !important;
+            max-width: 100% !important;
+            padding: 20px 16px !important;
+          }
+        }
+        
+        /* Steps hover effects */
+        .step:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15) !important;
+        }
+        
+        /* Tablet responsive styles for steps */
+        @media (max-width: 768px) {
+          .steps-container {
+            flex-direction: column !important;
+            gap: 20px !important;
+            max-width: 500px !important;
+            margin: 0 auto !important;
+          }
+          
+          .step {
+            min-width: 100% !important;
+            max-width: 100% !important;
+          }
         }
         
         @keyframes spin {
@@ -870,20 +903,22 @@ const styles = {
     fontFamily: theme.typography?.fontFamily?.humanistic?.join(', ') || 'Comfortaa, sans-serif',
   },
   stepsContainer: {
-    display: 'table',
+    display: 'flex',
+    gap: '20px',
     width: '100%',
-    tableLayout: 'fixed',
-    borderSpacing: '20px 0',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   step: {
-    display: 'table-cell',
-    verticalAlign: 'top',
+    flex: '1',
+    minWidth: '280px',
+    maxWidth: '320px',
     textAlign: 'center',
     background: 'rgba(255, 255, 255, 0.05)',
     padding: '24px 16px',
     borderRadius: '16px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    width: '33.333%',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   },
   stepIcon: {
     width: '50px',
