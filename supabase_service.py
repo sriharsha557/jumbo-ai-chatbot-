@@ -408,6 +408,72 @@ class SupabaseService:
 
     # ==================== MOOD HISTORY ====================
     
+    def create_mood_entry(self, mood_entry: Dict) -> Tuple[bool, str]:
+        """Create a new mood entry"""
+        try:
+            # Use admin client to bypass RLS for mood entries
+            response = self.admin_client.table('mood_entries').insert(mood_entry).execute()
+            
+            if response.data:
+                return True, "Mood entry created successfully"
+            else:
+                return False, "Failed to create mood entry"
+                
+        except Exception as e:
+            logger.error(f"Create mood entry error: {e}")
+            return False, str(e)
+
+    def get_mood_entries(self, user_id: str, days: int = None, limit: int = 50) -> List[Dict]:
+        """Get user's mood entries"""
+        try:
+            query = self.admin_client.table('mood_entries').select('*').eq('user_id', user_id)
+            
+            if days:
+                from datetime import datetime, timedelta
+                cutoff_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
+                query = query.gte('timestamp', cutoff_date)
+            
+            response = query.order('timestamp', desc=True).limit(limit).execute()
+            return response.data if response.data else []
+            
+        except Exception as e:
+            logger.error(f"Get mood entries error: {e}")
+            return []
+
+    def get_latest_mood_entry(self, user_id: str) -> Optional[Dict]:
+        """Get user's latest mood entry"""
+        try:
+            response = (self.admin_client.table('mood_entries')
+                       .select('*')
+                       .eq('user_id', user_id)
+                       .order('timestamp', desc=True)
+                       .limit(1)
+                       .execute())
+            
+            return response.data[0] if response.data else None
+            
+        except Exception as e:
+            logger.error(f"Get latest mood entry error: {e}")
+            return None
+
+    def delete_mood_entry(self, entry_id: int, user_id: str) -> Tuple[bool, str]:
+        """Delete a mood entry (only if it belongs to the user)"""
+        try:
+            response = (self.admin_client.table('mood_entries')
+                       .delete()
+                       .eq('id', entry_id)
+                       .eq('user_id', user_id)
+                       .execute())
+            
+            if response.data:
+                return True, "Mood entry deleted successfully"
+            else:
+                return False, "Mood entry not found or access denied"
+                
+        except Exception as e:
+            logger.error(f"Delete mood entry error: {e}")
+            return False, str(e)
+
     def save_mood_history(self, user_id: str, mood_data: Dict) -> Tuple[bool, str]:
         """Save mood history entry"""
         try:

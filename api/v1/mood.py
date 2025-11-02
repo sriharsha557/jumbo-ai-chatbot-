@@ -101,12 +101,10 @@ def create_mood_blueprint(supabase_service, auth_service):
             
             # Save to database
             try:
-                # Insert into mood_entries table
-                result = supabase_service.supabase.table('mood_entries').insert(mood_entry).execute()
+                # Use service method to insert mood entry (bypasses RLS)
+                success, message = supabase_service.create_mood_entry(mood_entry)
                 
-                if result.data:
-                    created_entry = result.data[0]
-                    
+                if success:
                     # Update user profile with latest mood
                     profile_update = {
                         'last_mood_type': mood_type,
@@ -126,17 +124,16 @@ def create_mood_blueprint(supabase_service, auth_service):
                         'success': True,
                         'message': 'Mood entry created successfully',
                         'mood_entry': {
-                            'id': created_entry['id'],
-                            'mood_type': created_entry['mood_type'],
-                            'timestamp': created_entry['timestamp'],
-                            'notes': created_entry.get('notes', ''),
-                            'session_id': created_entry.get('session_id')
+                            'mood_type': mood_type,
+                            'timestamp': parsed_timestamp.isoformat(),
+                            'notes': notes,
+                            'session_id': session_id
                         }
                     })
                 else:
                     return jsonify({
                         'success': False,
-                        'message': 'Failed to create mood entry'
+                        'message': f'Failed to create mood entry: {message}'
                     }), 500
                     
             except Exception as db_error:
