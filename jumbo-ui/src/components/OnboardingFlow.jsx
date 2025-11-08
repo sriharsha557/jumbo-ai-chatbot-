@@ -7,7 +7,6 @@ import { Sparkles } from 'lucide-react';
 const OnboardingFlow = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState({});
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -16,7 +15,7 @@ const OnboardingFlow = ({ onComplete }) => {
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
+    // User is fetched but we don't need to store it in state
     
     // Check localStorage for existing onboarding data
     const storedOnboardingData = localStorage.getItem('jumbo_onboarding_data');

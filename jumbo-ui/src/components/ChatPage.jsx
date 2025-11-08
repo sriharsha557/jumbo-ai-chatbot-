@@ -43,7 +43,6 @@ function ChatPage({ currentUser, sessionMoodData }) {
   };
 
   const recognitionRef = useRef(null);
-  const synthRef = useRef(window.speechSynthesis);
   const isListeningRef = useRef(false);
   const silenceTimerRef = useRef(null);
   const finalTranscriptRef = useRef('');

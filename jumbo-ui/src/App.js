@@ -203,7 +203,6 @@ function AppContent() {
         } else {
           // Check if user is stored in localStorage (fallback)
           const storedUser = localStorage.getItem('jumbo_user');
-          const storedOnboardingStatus = localStorage.getItem('jumbo_onboarding_completed');
           
           if (storedUser) {
             const userData = JSON.parse(storedUser);
@@ -341,9 +340,7 @@ function AppContent() {
     navigate('/');
   };
 
-  const handleHome = () => {
-    navigate('/');
-  };
+
 
   // Show loading state while checking for existing session or onboarding status
   if (isLoading || isCheckingOnboarding) {

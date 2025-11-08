@@ -104,8 +104,9 @@ class JumboChatbot:
                 return False, ""
         
         # Enhanced patterns to detect name responses - must be explicit
+        # Removed "i am" and "i'm" as they're too broad and match regular conversation
         name_patterns = [
-            "call me", "my name is", "name's", "i am",
+            "call me", "my name is", "name's", "name is",
             "please call", "you can call", "i prefer", "i go by",
             "my friends call me", "everyone calls me", "people call me"
         ]
@@ -198,12 +199,12 @@ class JumboChatbot:
         potential_name = original_message.strip()
         
         # Pattern-based extraction with regex
+        # Removed "i'm" and "i am" patterns as they're too broad
         extraction_patterns = [
             (r"call me (\w+(?:\s+\w+)?)", 1),
             (r"you can call me (\w+(?:\s+\w+)?)", 1),
-            (r"i'm (\w+(?:\s+\w+)?)", 1),
             (r"my name is (\w+(?:\s+\w+)?)", 1),
-            (r"i am (\w+(?:\s+\w+)?)", 1),
+            (r"name is (\w+(?:\s+\w+)?)", 1),
             (r"i prefer (?:to be called )?(\w+(?:\s+\w+)?)", 1),
             (r"i go by (\w+(?:\s+\w+)?)", 1),
             (r"(?:my friends?|everyone|people) calls? me (\w+(?:\s+\w+)?)", 1),
@@ -218,9 +219,10 @@ class JumboChatbot:
                 break
         else:
             # If no pattern matches, try simple prefix removal
+            # Removed "i'm" and "i am" as they're too broad
             prefixes_to_remove = [
-                "call me ", "you can call me ", "i'm ", "my name is ", 
-                "i am ", "just ", "i prefer ", "i go by ",
+                "call me ", "you can call me ", "my name is ", "name is ",
+                "just ", "i prefer ", "i go by ",
                 "my friends call me ", "everyone calls me ", "people call me ",
                 "just call me "
             ]
@@ -493,9 +495,13 @@ class JumboChatbot:
             if not user_has_name:
                 # Check if message contains explicit name-giving patterns before attempting extraction
                 message_lower = user_message.lower().strip()
+                
+                # VERY SPECIFIC patterns - must be clear name-giving intent
+                # Removed "i am" and "i'm" as they're too broad (matches "I am feeling", "I'm tired", etc.)
                 has_name_pattern = any(pattern in message_lower for pattern in [
-                    "call me", "my name is", "name's", "i am", "i'm",
-                    "please call", "you can call", "i prefer", "i go by"
+                    "call me", "my name is", "name's", "name is",
+                    "please call", "you can call", "i prefer", "i go by",
+                    "everyone calls me", "people call me", "my friends call me"
                 ])
                 
                 # Only attempt extraction if there's an explicit pattern
