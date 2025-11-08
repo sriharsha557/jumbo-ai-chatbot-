@@ -188,6 +188,7 @@ function ChatPage({ currentUser, sessionMoodData }) {
       setTranscript('');
       setScreenState('listening');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, conversationHistory]);
 
   useEffect(() => {

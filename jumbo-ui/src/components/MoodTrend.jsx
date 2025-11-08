@@ -47,6 +47,7 @@ const MoodTrend = ({ currentUser, days = 7 }) => {
 
   useEffect(() => {
     fetchMoodHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, days]);
 
   const fetchMoodHistory = async () => {

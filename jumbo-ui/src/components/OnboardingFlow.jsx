@@ -14,6 +14,7 @@ const OnboardingFlow = ({ onComplete }) => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkUser = async () => {
+    // eslint-disable-next-line no-unused-vars
     const { data: { user } } = await supabase.auth.getUser();
     // User is fetched but we don't need to store it in state
     

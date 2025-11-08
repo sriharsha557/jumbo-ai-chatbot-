@@ -88,6 +88,7 @@ const WelcomePage = ({ currentUser, onContinueToChat }) => {
       document.removeEventListener('click', initializeAudioForIOS);
       document.removeEventListener('touchstart', initializeAudioForIOS);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUserProfile = async () => {
