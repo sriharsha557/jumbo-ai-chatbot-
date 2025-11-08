@@ -78,24 +78,50 @@ class JumboChatbot:
 
     def check_for_name_preference(self, user_message: str, supabase_service) -> Tuple[bool, str]:
         """Check if user is providing their preferred name"""
-        # Enhanced patterns to detect name responses
-        name_patterns = [
-            "call me", "i'm", "my name is", "name's", "i am",
-            "just", "please call", "you can call", "i prefer", "i go by",
-            "my friends call me", "everyone calls me", "people call me"
-        ]
-        
         # Check if this looks like a name response
         message_lower = user_message.lower().strip()
         
-        # If it's a short response (likely a name) or contains name patterns
-        if (len(user_message.split()) <= 4 and len(user_message) > 1) or \
-           any(pattern in message_lower for pattern in name_patterns):
+        # Common greetings and phrases that should NOT be treated as names
+        # Check these FIRST before any pattern matching
+        excluded_phrases = [
+            'hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening',
+            'hi there', 'hello there', 'hey there', 'greetings', 'howdy',
+            'hello jumbo', 'hi jumbo', 'hey jumbo', 'hello, jumbo', 'hi, jumbo', 'hey, jumbo',
+            'how are you', 'what\'s up', 'sup', 'yo',
+            'thanks', 'thank you', 'ok', 'okay', 'yes', 'no', 'sure'
+        ]
+        
+        # If message matches any excluded phrase, don't extract name
+        # Check for exact match or if message starts with the phrase
+        for phrase in excluded_phrases:
+            if message_lower == phrase:
+                return False, ""
+            # Check if message starts with phrase followed by space, comma, or punctuation
+            if message_lower.startswith(phrase + ' ') or message_lower.startswith(phrase + ',') or message_lower.startswith(phrase + '!'):
+                return False, ""
+            # Also check if the entire message is just the phrase with punctuation
+            if message_lower.replace(',', '').replace('!', '').replace('.', '').strip() == phrase:
+                return False, ""
+        
+        # Enhanced patterns to detect name responses - must be explicit
+        name_patterns = [
+            "call me", "my name is", "name's", "i am",
+            "please call", "you can call", "i prefer", "i go by",
+            "my friends call me", "everyone calls me", "people call me"
+        ]
+        
+        # Only extract name if message contains explicit name patterns
+        if any(pattern in message_lower for pattern in name_patterns):
             
             # Extract the name using improved logic
             potential_name = self._extract_name_from_message(user_message, message_lower, name_patterns)
             
             if potential_name and len(potential_name.split()) <= 2:  # Max 2 words for name
+                # Validate it's actually a name (not a common word)
+                common_words = {'feeling', 'struck', 'good', 'bad', 'fine', 'okay', 'great', 'terrible'}
+                if potential_name.lower() in common_words:
+                    return False, ""
+                
                 # Capitalize properly
                 potential_name = ' '.join(word.capitalize() for word in potential_name.split())
                 
@@ -458,15 +484,30 @@ class JumboChatbot:
             self._current_memory_context = {}
         
         # Check if this is a name preference response (needs supabase_service)
+        # Only check for name if user doesn't already have a preferred name
+        # AND the message explicitly contains name-giving patterns
         if hasattr(self, '_supabase_service'):
-            is_name_response, name_message = self.check_for_name_preference(user_message, self._supabase_service)
-            if is_name_response:
-                return name_message, {
-                    "user": self.current_user.get("name"),
-                    "language": self.language.value,
-                    "response_type": "name_confirmation",
-                    "mood": "happy"
-                }
+            user_has_name = self.current_user.get('preferred_name') is not None
+            
+            # Only try to extract name if user doesn't have one AND message contains explicit name patterns
+            if not user_has_name:
+                # Check if message contains explicit name-giving patterns before attempting extraction
+                message_lower = user_message.lower().strip()
+                has_name_pattern = any(pattern in message_lower for pattern in [
+                    "call me", "my name is", "name's", "i am", "i'm",
+                    "please call", "you can call", "i prefer", "i go by"
+                ])
+                
+                # Only attempt extraction if there's an explicit pattern
+                if has_name_pattern:
+                    is_name_response, name_message = self.check_for_name_preference(user_message, self._supabase_service)
+                    if is_name_response:
+                        return name_message, {
+                            "user": self.current_user.get("name"),
+                            "language": self.language.value,
+                            "response_type": "name_confirmation",
+                            "mood": "happy"
+                        }
             
             # Check for memory recall requests
             recall_response = self.check_for_memory_recall(user_message, self._supabase_service)

@@ -65,6 +65,48 @@ function ChatPage({ currentUser, sessionMoodData }) {
     }
   }, []);
 
+  // Load conversation history when component mounts
+  useEffect(() => {
+    const loadConversationHistory = async () => {
+      if (!currentUser) return;
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.access_token) {
+          console.warn('No session token available for loading conversation history');
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/chat/history?limit=20`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.conversations) {
+            // Convert backend format to chat format
+            const history = data.conversations.flatMap(conv => [
+              { role: 'user', content: conv.message },
+              { role: 'assistant', content: conv.response }
+            ]);
+            setConversationHistory(history);
+            console.log('✅ Loaded conversation history:', history.length, 'messages');
+          }
+        } else {
+          console.warn('Failed to load conversation history:', response.status);
+        }
+      } catch (error) {
+        console.error('Error loading conversation history:', error);
+      }
+    };
+
+    loadConversationHistory();
+  }, [currentUser]);
+
   const handleSendMessage = useCallback(async (message) => {
     if (!message.trim() || !currentUser) return;
 

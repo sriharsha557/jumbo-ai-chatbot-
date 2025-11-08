@@ -121,6 +121,8 @@ class ResponsePolisher:
         """
         Polish a raw response to ensure emotional alignment and quality
         
+        SIMPLIFIED: Just do basic grammar fixes, let LLM handle everything else
+        
         Args:
             raw_response: The original response to polish
             user_emotion: Detected user emotion
@@ -131,17 +133,14 @@ class ResponsePolisher:
             Polished, emotionally-aligned response
         """
         try:
+            # If response is empty, generate a simple fallback
             if not raw_response or not raw_response.strip():
-                return self._generate_fallback_response(user_emotion, user_name)
+                return "I'm here for you. What's on your mind?"
             
             polished = raw_response.strip()
             
-            # Apply polishing steps in order
+            # ONLY do basic grammar fixes - let the LLM handle personality
             polished = self._fix_grammar_and_readability(polished)
-            polished = self._ensure_emotional_alignment(polished, user_emotion)
-            polished = self._add_empathy_if_missing(polished, user_emotion)
-            polished = self._integrate_name_naturally(polished, user_name)
-            polished = self._enhance_conversation_flow(polished, user_emotion, context)
             polished = self._final_quality_check(polished)
             
             logger.debug(f"Response polished: {len(raw_response)} → {len(polished)} chars")
@@ -191,6 +190,10 @@ class ResponsePolisher:
     
     def _add_empathy_if_missing(self, text: str, emotion: str) -> str:
         """Add empathy markers if the response lacks them"""
+        # DISABLED: Let the LLM handle empathy naturally
+        # The polisher was adding too many canned empathy phrases
+        return text
+        
         if emotion == 'neutral' or emotion not in self.empathy_enhancers:
             return text
         
@@ -213,6 +216,10 @@ class ResponsePolisher:
     
     def _integrate_name_naturally(self, text: str, user_name: str) -> str:
         """Integrate user's name naturally into the response"""
+        # DISABLED: Let the LLM handle name usage naturally
+        # The polisher was adding "I hear you, {name}" too often
+        return text
+        
         if not user_name or user_name.lower() in ['user', 'friend', 'guest']:
             return text
         
@@ -244,6 +251,10 @@ class ResponsePolisher:
     
     def _enhance_conversation_flow(self, text: str, emotion: str, context: Dict = None) -> str:
         """Enhance conversation flow with follow-up questions or supportive statements"""
+        # DISABLED: Let the LLM handle conversation flow naturally
+        # The polisher was adding too many generic phrases
+        return text
+        
         # Don't add flow enhancers to very short responses
         if len(text.split()) < 5:
             return text

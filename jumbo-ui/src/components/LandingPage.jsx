@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, Heart, Mic, MessageCircle, Info, LogIn, Smartphone } from 'lucide-react';
 import { theme } from '../theme/theme';
+import SEO from './SEO';
 
 function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
   const [scrolled, setScrolled] = React.useState(false);
@@ -32,8 +33,15 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
   }, [videoLoaded]);
 
   return (
-    <div style={styles.container}>
-      {/* Background Video */}
+    <>
+      <SEO 
+        title="Jumbo - Your AI Emotional Support Companion | 24/7 Mental Wellness"
+        description="Get personalized emotional support anytime with Jumbo. AI-powered mental health companion offering mood tracking, empathetic conversations, and wellness support."
+        keywords="AI companion, emotional support, mental health, wellness app, mood tracking, therapy chatbot, mental wellness, AI therapist"
+        canonical="https://hellojumbo.xyz/"
+      />
+      <div style={styles.container}>
+        {/* Background Video */}
       {!videoError && (
         <video
           autoPlay
@@ -568,6 +576,7 @@ function LandingPage({ onGetStarted, onAbout, onHelp, onLogin, onHome }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

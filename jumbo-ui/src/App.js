@@ -22,9 +22,23 @@ function AppContent() {
     return storedStatus !== 'true'; // Need onboarding if not completed
   });
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
+  
   const [welcomeShownThisSession, setWelcomeShownThisSession] = useState(() => {
     // Check if welcome was shown in this session
-    return sessionStorage.getItem('jumbo_welcome_shown') === 'true';
+    const welcomeShown = sessionStorage.getItem('jumbo_welcome_shown') === 'true';
+    const welcomeTimestamp = sessionStorage.getItem('jumbo_welcome_timestamp');
+    
+    // If welcome was shown and has a timestamp, consider it valid
+    // This prevents re-showing welcome on tab switch
+    if (welcomeShown && welcomeTimestamp) {
+      const timeSinceWelcome = Date.now() - parseInt(welcomeTimestamp);
+      // If less than 1 hour, consider welcome still valid
+      if (timeSinceWelcome < 3600000) {
+        return true;
+      }
+    }
+    
+    return welcomeShown;
   });
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -108,9 +122,10 @@ function AppContent() {
   const handleWelcomeComplete = (moodData) => {
     console.log('✅ Welcome page completed', moodData ? 'with mood data' : 'without mood data');
     
-    // Mark welcome as shown for this session
+    // Mark welcome as shown for this session - use a timestamp to make it more reliable
     setWelcomeShownThisSession(true);
     sessionStorage.setItem('jumbo_welcome_shown', 'true');
+    sessionStorage.setItem('jumbo_welcome_timestamp', Date.now().toString());
     
     // Store mood data if provided
     if (moodData) {
@@ -203,6 +218,7 @@ function AppContent() {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           console.log('Auth state changed:', event, session);
           
+          // Only handle actual sign-in events, not session refreshes or initial sessions
           if (event === 'SIGNED_IN' && session?.user) {
             const userData = {
               id: session.user.id,
@@ -213,14 +229,44 @@ function AppContent() {
               access_token: session.access_token
             };
             
+            // Check if this is a NEW login or just a session refresh
+            const existingUser = localStorage.getItem('jumbo_user');
+            const isNewLogin = !existingUser || !currentUser;
+            
             // Store user in localStorage
             localStorage.setItem('jumbo_user', JSON.stringify(userData));
             
             setCurrentUser(userData);
             
-            // For new Google login, go to onboarding
-            setNeedsOnboarding(true);
-            navigate('/onboarding');
+            // Only redirect to onboarding for NEW logins, not session refreshes
+            if (isNewLogin) {
+              console.log('🆕 New login detected - checking onboarding status');
+              // Check if they've completed onboarding before
+              const hasCompletedOnboarding = localStorage.getItem('jumbo_onboarding_completed') === 'true';
+              
+              if (!hasCompletedOnboarding) {
+                setNeedsOnboarding(true);
+                navigate('/onboarding');
+              } else {
+                // They've already completed onboarding, go to welcome or chat
+                const welcomeShown = sessionStorage.getItem('jumbo_welcome_shown') === 'true';
+                if (!welcomeShown) {
+                  navigate('/welcome');
+                } else {
+                  navigate('/chat');
+                }
+              }
+            } else {
+              console.log('🔄 Session refresh detected - maintaining current page');
+              // Don't navigate, just update the user data
+            }
+          }
+          
+          // Handle INITIAL_SESSION - this fires when page loads with existing session
+          if (event === 'INITIAL_SESSION' && session?.user) {
+            console.log('🔄 Initial session detected - maintaining state');
+            // Don't do anything - let the initial useEffect handle this
+            // This prevents unnecessary redirects on page load
           }
           
           if (event === 'SIGNED_OUT') {
@@ -228,6 +274,8 @@ function AppContent() {
             localStorage.removeItem('jumbo_onboarding_completed');
             localStorage.removeItem('jumbo_current_session_mood');
             localStorage.removeItem('jumbo_mood_history');
+            sessionStorage.removeItem('jumbo_welcome_shown');
+            sessionStorage.removeItem('jumbo_welcome_timestamp');
             setCurrentUser(null);
             navigate('/');
             setNeedsOnboarding(false);
@@ -375,8 +423,8 @@ function AppContent() {
     );
   }
 
-  // If user should see welcome page first
-  if (location.pathname === '/welcome' || (!welcomeShownThisSession && (location.pathname === '/' || location.pathname === '/chat'))) {
+  // If user is explicitly on welcome page, show it
+  if (location.pathname === '/welcome') {
     return (
       <Routes>
         <Route path="/welcome" element={
@@ -388,6 +436,23 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/welcome" replace />} />
       </Routes>
     );
+  }
+  
+  // Only redirect to welcome if user is on root path AND hasn't seen welcome
+  // Don't redirect if user is already on /chat or /profile
+  const isOnProtectedRoute = location.pathname === '/chat' || location.pathname === '/profile';
+  
+  if (!welcomeShownThisSession && location.pathname === '/' && !isOnProtectedRoute) {
+    return <Navigate to="/welcome" replace />;
+  }
+  
+  // If user is on chat or profile without seeing welcome, mark welcome as shown
+  // This handles the case where user navigates directly to /chat
+  if (!welcomeShownThisSession && isOnProtectedRoute) {
+    console.log('📍 User on protected route without welcome - marking welcome as shown');
+    setWelcomeShownThisSession(true);
+    sessionStorage.setItem('jumbo_welcome_shown', 'true');
+    sessionStorage.setItem('jumbo_welcome_timestamp', Date.now().toString());
   }
 
   // Authenticated user with main app

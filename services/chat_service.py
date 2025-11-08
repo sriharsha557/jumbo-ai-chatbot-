@@ -184,9 +184,10 @@ class ChatService:
     def _is_first_time_user(self, user_profile: Dict, conversation_context: List[Dict]) -> bool:
         """Check if this is a first-time user without preferred name"""
         has_preferred_name = user_profile.get('preferred_name') is not None
-        has_conversation_history = conversation_context and len(conversation_context) > 0
         
-        return not has_preferred_name and not has_conversation_history
+        # Return True if user doesn't have a preferred name, regardless of conversation history
+        # This ensures we keep asking for their name until they provide it
+        return not has_preferred_name
     
     def _handle_first_time_user(self, user_profile: Dict, message: str) -> str:
         """Handle first-time user interaction"""
@@ -200,13 +201,16 @@ class ChatService:
     def _handle_first_time_user_with_personality(self, user_profile: Dict, message: str, emotion: str) -> str:
         """Handle first-time user interaction with personality system"""
         try:
-            # Use personality service to create a warm, emotion-aware greeting
-            greeting = self.personality_service.get_conversation_starter(emotion)
+            # Check if this is literally the first message (greeting)
+            message_lower = message.lower().strip()
+            is_greeting = any(greet in message_lower for greet in ['hi', 'hello', 'hey', 'greetings', 'howdy'])
             
-            # Add name request naturally
-            name_request = "I'd love to know what you'd like me to call you - what name feels right?"
-            
-            return f"{greeting} {name_request}"
+            if is_greeting:
+                # Respond to greeting and ask for name
+                return "Hey there! 👋 I'm Jumbo, your emotional support companion. I'd love to get to know you better - what should I call you?"
+            else:
+                # They sent something other than a greeting, still ask for name
+                return "Hi! I'm Jumbo. Before we chat, I'd love to know what to call you. What's your name?"
             
         except Exception as e:
             logger.error(f"Error in personality-enhanced first-time user handling: {e}")
