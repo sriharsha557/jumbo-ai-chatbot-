@@ -11,24 +11,29 @@ httpx==0.27.2
 # Environment and configuration
 python-dotenv==1.0.0
 
-# Database and storage - Supabase with all dependencies
+# Database and storage - Supabase
+# supabase 2.24.0 requires: postgrest>=2.24.0, realtime>=2.24.0, storage3>=0.8.1, gotrue>=2.11.0
 supabase==2.24.0
 
 # LLM and AI
+# groq 0.14.0 requires: pydantic<3,>=1.9.0
 groq==0.14.0
 
 # Authentication and security
-pyjwt==2.8.0
+# supabase-auth 2.24.0 requires: pyjwt>=2.10.1
+pyjwt==2.10.1
 cryptography==42.0.8
 
 # Monitoring and logging
 sentry-sdk==1.40.0
 
 # Data processing
+# realtime 2.24.0 requires: pydantic<3.0.0,>=2.11.7
+# This is the minimum version that satisfies all requirements
 pydantic==2.11.7
 
 # Production server
 gunicorn==21.2.0
 
-# Additional dependencies that may be needed
+# Additional dependencies
 python-dateutil==2.8.2
