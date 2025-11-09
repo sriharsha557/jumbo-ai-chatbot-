@@ -25,7 +25,7 @@ cryptography==42.0.8
 sentry-sdk==1.40.0
 
 # Data processing
-pydantic==2.5.0
+pydantic==2.11.7
 
 # Production server
 gunicorn==21.2.0
